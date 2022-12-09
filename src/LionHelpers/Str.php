@@ -184,4 +184,8 @@ class Str {
 		return preg_match($test, self::$word);
 	}
 
+	public static function trim(string $trim = ""): string {
+		return $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
+	}
+
 }
