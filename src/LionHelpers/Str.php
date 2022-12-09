@@ -7,7 +7,7 @@ use LionHelpers\Arr;
 class Str {
 
 	private static ?Str $str = null;
-	private static string $word;
+	private static ?string $word;
 
 	public function __construct() {
 
@@ -50,7 +50,7 @@ class Str {
 		return self::$str;
 	}
 
-	public static function of(string $word): Str {
+	public static function of(mixed $word): Str {
 		if (self::$str === null) {
 			self::$str = new Str();
 		}
@@ -65,6 +65,10 @@ class Str {
 
 	public static function ln(): string {
 		return self::$word . "\n";
+	}
+
+	public static function toString(): string {
+		return self::$word === null ? "" : self::$word;
 	}
 
 	public static function toNull(): ?string {
