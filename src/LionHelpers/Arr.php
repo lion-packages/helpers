@@ -126,4 +126,8 @@ class Arr {
 		return $value === null ? [] : [$value];
 	}
 
+	public static function length(array $items): int {
+		return count($items);
+	}
+
 }
