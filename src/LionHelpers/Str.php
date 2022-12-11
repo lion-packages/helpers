@@ -63,8 +63,9 @@ class Str {
 		return $prepend . self::$word;
 	}
 
-	public static function ln(): string {
-		return self::$word . "\n";
+	public static function ln(): Str {
+		self::$word .=  "\n";
+		return self::$str;
 	}
 
 	public static function toString(): string {
