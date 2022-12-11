@@ -6,57 +6,99 @@ use LionHelpers\Str;
 
 class Arr {
 
-	private function __construct() {
+	private static ?Arr $arr = null;
+	private static ?array $items;
+
+	public function __construct() {
 
 	}
 
-	public static function join(array $items, string $delimiter, string $str = ""): string {
-		$new_text = "";
-		$size = count($items) - 1;
+	public static function get(): array {
+		return self::$items;
+	}
 
-		foreach ($items as $key => $item) {
+	public static function push(mixed $value, int|string $key = ''): Arr {
+		if ($key === '') {
+			self::$items[] = $value;
+		} else {
+			self::$items[$key] = $value;
+		}
+
+		return self::$arr;
+	}
+
+	public static function of(array $items = []): Arr {
+		if (self::$arr === null) {
+			self::$arr = new Arr();
+		}
+
+		self::$items = $items;
+		return self::$arr;
+	}
+
+	public static function length(): int {
+		return count(self::$items);
+	}
+
+	public static function join(string $delimiter, string $str = ""): string {
+		$new_text = "";
+		$size = self::length(self::$items) - 1;
+
+		foreach (self::$items as $key => $item) {
 			if ($key === 0) {
 				$new_text .= $item;
 			} elseif ($key === $size) {
-				$new_text .= $str != "" ? "{$str}{$item}" : "{$delimiter}{$item}";
+				$new_text .= $str != "" ? ($str . $item) : ($delimiter . $item);
 			} else {
-				$new_text .= "{$delimiter}{$item}";
+				$new_text .= ($delimiter . $item);
 			}
 		}
 
 		return $new_text;
 	}
 
-	public static function keyBy(array $items, string $column): array {
+	public static function keyBy(string $column): array {
 		$new_items = [];
 
-		foreach ($items as $key => $item) {
-			$new_items[$item->{"{$column}"}] = $item;
-		}
-
-		return $new_items;
-	}
-
-	public static function tree(array $items, string $column): array {
-		$new_items = [];
-
-		foreach ($items as $key => $item) {
-			if (!isset($new_items[$item->{"{$column}"}])) {
-				$new_items[$item->{"{$column}"}] = [$item];
+		foreach (self::$items as $key => $item) {
+			if (gettype($item) === 'object') {
+				$new_items[$item->{"{$column}"}] = $item;
 			} else {
-				array_push($new_items[$item->{"{$column}"}], $item);
+				$new_items[$item[$column]] = $item;
 			}
 		}
 
 		return $new_items;
 	}
 
-	public static function prepend(array $items, string $item, string $key = ""): array {
-		return $key === "" ? [$item, ...$items] : [$key => $item, ...$items];
+	public static function tree(string $column): array {
+		$new_items = [];
+
+		foreach (self::$items as $key => $item) {
+			if (gettype($item) === 'object') {
+				if (!isset($new_items[$item->{"{$column}"}])) {
+					$new_items[$item->{"{$column}"}] = [$item];
+				} else {
+					array_push($new_items[$item->{"{$column}"}], $item);
+				}
+			} else {
+				if (!isset($new_items[$item[$column]])) {
+					$new_items[$item[$column]] = [$item];
+				} else {
+					array_push($new_items[$item[$column]], $item);
+				}
+			}
+		}
+
+		return $new_items;
 	}
 
-	public static  function random(array $items, int $cont = 1): mixed {
-		$size = count($items);
+	public static function prepend(string $item, string $key = ""): array {
+		return $key === "" ? [$item, ...self::$items] : [$key => $item, ...self::$items];
+	}
+
+	public static  function random(int $cont = 1): mixed {
+		$size = self::length(self::$items);
 
 		if ($cont > $size) {
 			return (object) ['status' => 'error', 'message' => "element size exceeds array size"];
@@ -71,7 +113,7 @@ class Arr {
 			$iterate = 0;
 
 			do {
-				$item = $get_random_item($items, $all_size);
+				$item = $get_random_item(self::$items, $all_size);
 
 				if (!$search_item($all_items, $item)) {
 					$all_items[] = $item;
@@ -82,18 +124,18 @@ class Arr {
 			return $all_items;
 		}
 
-		return $get_random_item($items, $all_size);
+		return $get_random_item(self::$items, $all_size);
 	}
 
-	public static  function sort(array $items): array {
-		asort($items);
-		return $items;
+	public static  function sort(int $type): Arr {
+		sort(self::$items, $type);
+		return self::$arr;
 	}
 
-	public static  function where(array $items, \Closure $callback) {
+	public static  function where(\Closure $callback): array {
 		$new_items = [];
 
-		foreach ($items as $key => $item) {
+		foreach (self::$items as $key => $item) {
 			if ($callback($item, $key)) {
 				$new_items[$key] = $item;
 			}
@@ -102,32 +144,32 @@ class Arr {
 		return $new_items;
 	}
 
-	public static function whereNotNull(array $items): array {
+	public static function whereNotNull(): array {
 		$new_items = [];
 
-		foreach ($items as $key => $item) {
-			if (Str::toNull($item) != null) {
+		foreach (self::$items as $key => $item) {
+			if (in_array(gettype($item), ['array', 'object', 'closure'])) {
 				$new_items[$key] = $item;
+			} else {
+				if (Str::of($item)->toNull() != null) {
+					$new_items[$key] = $item;
+				}
 			}
 		}
 
 		return $new_items;
 	}
 
-	public static function first(array $items): mixed {
-		return $items[0];
+	public static function first(): mixed {
+		return self::$items[0];
 	}
 
-	public static function last(array $items): mixed {
-		return $items[count($items) - 1];
+	public static function last(): mixed {
+		return self::$items[self::length(self::$items) - 1];
 	}
 
 	public static function wrap(mixed $value): array {
 		return $value === null ? [] : [$value];
-	}
-
-	public static function length(array $items): int {
-		return count($items);
 	}
 
 }
