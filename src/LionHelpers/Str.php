@@ -192,4 +192,9 @@ class Str {
 		return $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
 	}
 
+	public static function concat(string $word): Str {
+		self::$word .= $word;
+		return self::$str;
+	}
+
 }
