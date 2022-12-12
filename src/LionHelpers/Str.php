@@ -13,6 +13,10 @@ class Str {
 
 	}
 
+	private function clean(): void {
+		self::$word = '';
+	}
+
 	private static function replaceChars(string $type, array $chars = []): string {
 		$item_default_chart = "";
 		$item_replace_chart = "";
@@ -42,7 +46,9 @@ class Str {
 	}
 
 	public static function get(): string {
-		return self::$word;
+		$new_str = self::$word;
+		self::clean();
+		return $new_str;
 	}
 
 	public static function replace($search_item, $replace_item): Str {
@@ -134,11 +140,15 @@ class Str {
 	}
 
 	public static function lower(): string {
-		return strtolower(self::$word);
+		$new_str = strtolower(self::$word);
+		self::clean();
+		return $new_str;
 	}
 
 	public static function upper(): string {
-		return strtoupper(self::$word);
+		$new_str = strtoupper(self::$word);
+		self::clean();
+		return $new_str;
 	}
 
 	public static function mask(string $char, int $ignore): string {
@@ -190,7 +200,9 @@ class Str {
 	}
 
 	public static function trim(string $trim = ""): string {
-		return $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
+		$new_str = $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
+		self::clean();
+		return $new_str;
 	}
 
 	public static function concat(string $word): Str {
