@@ -13,7 +13,7 @@ class Str {
 
 	}
 
-	private function clean(): void {
+	private static function clean(): void {
 		self::$word = '';
 	}
 
