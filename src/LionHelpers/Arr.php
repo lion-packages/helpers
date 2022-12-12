@@ -7,10 +7,14 @@ use LionHelpers\Str;
 class Arr {
 
 	private static ?Arr $arr = null;
-	private static ?array $items;
+	private static ?array $items = [];
 
 	public function __construct() {
 
+	}
+
+	private static function clean(): void {
+		self::$items = [];
 	}
 
 	public static function get(): array {
@@ -68,6 +72,7 @@ class Arr {
 			}
 		}
 
+		self::clean();
 		return $new_items;
 	}
 
@@ -90,15 +95,18 @@ class Arr {
 			}
 		}
 
+		self::clean();
 		return $new_items;
 	}
 
 	public static function prepend(string $item, string $key = ""): array {
-		return $key === "" ? [$item, ...self::$items] : [$key => $item, ...self::$items];
+		$new_arr = $key === "" ? [$item, ...self::$items] : [$key => $item, ...self::$items];
+		self::clean();
+		return $new_arr;
 	}
 
 	public static  function random(int $cont = 1): mixed {
-		$size = self::length(self::$items);
+		$size = self::length();
 
 		if ($cont > $size) {
 			return (object) ['status' => 'error', 'message' => "element size exceeds array size"];
@@ -121,10 +129,13 @@ class Arr {
 				}
 			} while ($iterate < $cont);
 
+			self::clean();
 			return $all_items;
 		}
 
-		return $get_random_item(self::$items, $all_size);
+		$new_arr = $get_random_item(self::$items, $all_size);
+		self::clean();
+		return $new_arr;
 	}
 
 	public static  function sort(int $type): Arr {
@@ -141,6 +152,7 @@ class Arr {
 			}
 		}
 
+		self::clean();
 		return $new_items;
 	}
 
@@ -157,15 +169,20 @@ class Arr {
 			}
 		}
 
+		self::clean();
 		return $new_items;
 	}
 
 	public static function first(): mixed {
-		return self::$items[0];
+		$new_arr = self::$items[0];
+		self::clean();
+		return $new_arr;
 	}
 
 	public static function last(): mixed {
-		return self::$items[self::length(self::$items) - 1];
+		$new_arr = self::$items[self::length(self::$items) - 1];
+		self::clean();
+		return $new_arr;
 	}
 
 	public static function wrap(mixed $value): array {
