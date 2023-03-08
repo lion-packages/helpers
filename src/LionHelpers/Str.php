@@ -87,13 +87,13 @@ class Str {
 	}
 
 	public static function before(string $delimiter): string {
-		self::$word = Arr::first(explode($delimiter, self::$word));
+		self::$word = Arr::of(explode($delimiter, self::$word))->first();
 		$first = self::toNull();
 		return $first === null ? self::$word : $first;
 	}
 
 	public static function after(string $delimiter): string {
-		self::$word = Arr::last(explode($delimiter, self::$word));
+		self::$word = Arr::of(explode($delimiter, self::$word))->last();
 		$last = self::toNull();
 		return $last === null ? self::$word : $last;
 	}
