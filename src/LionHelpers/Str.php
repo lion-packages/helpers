@@ -65,8 +65,9 @@ class Str {
 		return self::$str;
 	}
 
-	public static function prepend(string $prepend): string {
-		return $prepend . self::$word;
+	public static function prepend(string $prepend): Str {
+		self::$word = $prepend . self::$word;
+		return self::$str;
 	}
 
 	public static function ln(): Str {
@@ -74,8 +75,9 @@ class Str {
 		return self::$str;
 	}
 
-	public static function toString(): string {
-		return self::$word === null ? "" : self::$word;
+	public static function toString(): Str {
+		self::$word = self::$word === null ? "" : self::$word;
+		return self::$str;
 	}
 
 	public static function toNull(): ?string {
@@ -103,31 +105,36 @@ class Str {
 		return self::before($second_delimiter);
 	}
 
-	public static function camel(): mixed {
-		return lcfirst(str_replace(" ", "", ucwords(self::$word)));
+	public static function camel(): Str {
+		self::$word = lcfirst(str_replace(" ", "", ucwords(strtolower(self::$word))));
+		return self::$str;
 	}
 
-	public static function pascal(): string {
-		return str_replace(" ", "", ucwords(self::$word));
+	public static function pascal(): Str {
+		self::$word = str_replace(" ", "", ucwords(strtolower(self::$word)));
+		return self::$str;
 	}
 
-	public static function snake(array $chars = []): string {
-		return self::replaceChars('snake', $chars);
+	public static function snake(array $chars = []): Str {
+		self::$word = self::replaceChars('snake', $chars);
+		return self::$str;
 	}
 
-	public static function kebab(array $chars = []): string {
-		return self::replaceChars('kebab', $chars);
+	public static function kebab(array $chars = []): Str {
+		self::$word = self::replaceChars('kebab', $chars);
+		return self::$str;
 	}
 
-	public static function headline(): string {
-		return ucwords(self::replaceChars('all'));
+	public static function headline(): Str {
+		self::$word = ucwords(self::replaceChars('all'));
+		return self::$str;
 	}
 
 	public static function length(): int {
 		return strlen(self::$word);
 	}
 
-	public static function limit(int $limit = 10): string {
+	public static function limit(int $limit = 10): Str {
 		$new_str = "";
 		$length = self::length();
 		$limit = $limit > $length ? $length : $limit;
@@ -136,22 +143,21 @@ class Str {
 			$new_str .= self::$word[$i];
 		}
 
-		return $new_str;
+		self::$word = $new_str;
+		return self::$str;
 	}
 
-	public static function lower(): string {
-		$new_str = strtolower(self::$word);
-		self::clean();
-		return $new_str;
+	public static function lower(): Str {
+		self::$word = strtolower(self::$word);
+		return self::$str;
 	}
 
-	public static function upper(): string {
-		$new_str = strtoupper(self::$word);
-		self::clean();
-		return $new_str;
+	public static function upper(): Str {
+		self::$word = strtoupper(self::$word);
+		return self::$str;
 	}
 
-	public static function mask(string $char, int $ignore): string {
+	public static function mask(string $char, int $ignore): Str {
 		$new_str = "";
 		$size = self::length(self::$word);
 		$ignore_size = $size;
@@ -165,7 +171,8 @@ class Str {
 			}
 		}
 
-		return $new_str;
+		self::$word = $new_str;
+		return self::$str;
 	}
 
 	public static function contains(array $words): bool {
@@ -179,7 +186,7 @@ class Str {
 		return true;
 	}
 
-	public static function swap(array $swaps): string {
+	public static function swap(array $swaps): Str {
 		$new_str = "";
 		$i = 0;
 
@@ -192,17 +199,17 @@ class Str {
 			}
 		}
 
-		return $new_str;
+		self::$word = $new_str;
+		return self::$str;
 	}
 
 	public static function test(string $test): bool {
 		return preg_match($test, self::$word);
 	}
 
-	public static function trim(string $trim = ""): string {
-		$new_str = $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
-		self::clean();
-		return $new_str;
+	public static function trim(string $trim = ""): Str {
+		self::$word = $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
+		return self::$str;
 	}
 
 	public static function concat(string $word): Str {
