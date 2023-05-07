@@ -75,6 +75,11 @@ class Str {
 		return self::$str;
 	}
 
+	public static function lt(): Str {
+		self::$word .=  "\t";
+		return self::$str;
+	}
+
 	public static function toString(): Str {
 		self::$word = self::$word === null ? "" : self::$word;
 		return self::$str;
