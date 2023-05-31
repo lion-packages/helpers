@@ -17,6 +17,11 @@ class Arr {
 		self::$items = [];
 	}
 
+	public static function keys(): Arr {
+		self::$items = array_keys(self::$items);
+		return self::$arr;
+	}
+
 	public static function values(): Arr {
 		self::$items = array_values(self::$items);
 		return self::$arr;
