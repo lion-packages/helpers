@@ -51,17 +51,24 @@ class Str {
 		return $new_str;
 	}
 
-	public static function replace($search_item, $replace_item): Str {
-		self::$word = str_replace($search_item, $replace_item, self::$word);
+	public static function of(mixed $word): Str {
+		self::$str = new Str();
+		self::$word = $word;
 		return self::$str;
 	}
 
-	public static function of(mixed $word): Str {
-		if (self::$str === null) {
-			self::$str = new Str();
+	// ---------------------------------------------------------------------------------------------
+
+	public static function spaces(int $spaces = 1): Str {
+		for ($i = 0; $i < $spaces; $i++) {
+			self::$word .= " ";
 		}
 
-		self::$word = $word;
+		return self::$str;
+	}
+
+	public static function replace($search_item, $replace_item): Str {
+		self::$word = str_replace($search_item, $replace_item, self::$word);
 		return self::$str;
 	}
 
