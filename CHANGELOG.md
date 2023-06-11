@@ -1,5 +1,10 @@
 # Release Notes
 
+## [v2.5.0](https://github.com/Sleon4/Lion-Helpers/compare/v2.4.0...v2.5.0) (2023-06-11)
+
+### Added
+- added split function in LionHelpers\Str class
+
 ## [v2.4.0](https://github.com/Sleon4/Lion-Helpers/compare/v2.3.0...v2.4.0) (2023-06-07)
 
 ### Added
