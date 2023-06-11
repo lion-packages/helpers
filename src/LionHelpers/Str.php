@@ -59,6 +59,10 @@ class Str {
 
 	// ---------------------------------------------------------------------------------------------
 
+	public static function split(string $split): array {
+		return explode($split, self::$word);
+	}
+
 	public static function spaces(int $spaces = 1): Str {
 		for ($i = 0; $i < $spaces; $i++) {
 			self::$word .= " ";
