@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LionHelpers;
 
 use Closure;
+use InvalidArgumentException;
 use LionHelpers\Str;
 
 class Arr
@@ -54,7 +55,10 @@ class Arr
      * */
 	public function get(): array|object
     {
-		return $this->items;
+        $items = $this->items;
+        $this->clean();
+
+		return $items;
 	}
 
     /**
@@ -67,7 +71,6 @@ class Arr
 		} else {
 			$this->items[$key] = $value;
 		}
-
 
         return $this;
 	}
@@ -93,22 +96,18 @@ class Arr
     /**
      * Joins the values of the current array in string format using the defined delimiter
      * */
-	public function join(string $delimiter, string $str = ''): string
+	public function join(string $separator = ', ', ?string $lastSeparator = null): string
     {
-		$newText = '';
-		$size = self::length($this->items) - 1;
+        $items = $this->items;
+        $this->clean();
 
-		foreach ($this->items as $key => $item) {
-			if ($key === 0) {
-				$newText .= $item;
-			} elseif ($key === $size) {
-				$newText .= $str != '' ? ($str . $item) : ($delimiter . $item);
-			} else {
-				$newText .= ($delimiter . $item);
-			}
-		}
+        if (null === $lastSeparator) {
+            return implode($separator, $items);
+        }
 
-		return $newText;
+        $lastElement = array_pop($items);
+
+        return implode($separator, $items) . "{$lastSeparator}{$lastElement}";
 	}
 
     /**
@@ -118,7 +117,7 @@ class Arr
     {
 		$newItems = [];
 
-		foreach ($this->items as $key => $item) {
+		foreach ($this->items as $item) {
 			if ('object' === gettype($item)) {
 				$newItems[$item->{"{$column}"}] = $item;
 			} else {
@@ -173,47 +172,35 @@ class Arr
     /**
      * Select a number of random elements from an array
      * */
-	public function random(int $cont = 1): Arr
+	public function random(int $limit = 1): Arr
     {
 		$size = $this->length();
 
-		if ($cont > $size) {
-			return (object) ['status' => 'error', 'message' => 'element size exceeds array size'];
+		if ($limit > $size) {
+            throw new InvalidArgumentException('element size exceeds array size');
 		}
 
-		$allItems = [];
-		$allSize = $size - 1;
-		$getRandomItem = fn(array $items, $allSize) => $items[rand(0, $allSize)];
-		$searchItem = fn(array $allItems, mixed $item) => in_array($item, $allItems);
+        $randomIdxs = [];
 
-		if ($cont > 1) {
-			$iterate = 0;
+        do {
+            $randomIdx = array_rand($this->items);
 
-			do {
-				$item = $getRandomItem($this->items, $allSize);
+            if (!in_array($randomIdx, $randomIdxs, true)) {
+                $randomIdxs[] = $randomIdx;
+            }
 
-				if (!$searchItem($allItems, $item)) {
-					$allItems[] = $item;
-					$iterate++;
-				}
-			} while ($iterate < $cont);
+            if (count($randomIdxs) === $limit) {
+                break;
+            }
+        } while (true);
 
-			$this->items = $allItems;
+        $randomElements = [];
 
-			return $this;
-		}
+        foreach ($randomIdxs as $key) {
+            $randomElements[] = $this->items[$key];
+        }
 
-		$this->items = $getRandomItem($this->items, $allSize);
-
-		return $this;
-	}
-
-    /**
-     * Sorts the elements in ascending order of the values (string and numeric) of an array.
-     * */
-	public function sort(int $type): Arr
-    {
-		sort($this->items, $type);
+        $this->items = $randomElements;
 
         return $this;
 	}
@@ -239,7 +226,7 @@ class Arr
     /**
      * Gets a new array of elements where the values are neither null nor empty
      * */
-	public function whereNotNull(): Arr
+	public function whereNotEmpty(): Arr
     {
         $str = new Str();
 		$newItems = [];
@@ -248,7 +235,7 @@ class Arr
 			if (in_array(gettype($item), ['array', 'object', 'closure'])) {
 				$newItems[$key] = $item;
 			} else {
-				if ($str->of($item)->toNull() != null) {
+				if (!empty($str->of($item)->toNull()->get())) {
 					$newItems[$key] = $item;
 				}
 			}
@@ -264,7 +251,7 @@ class Arr
      * */
 	public function first(): mixed
     {
-		$value = $this->items[0];
+		$value = reset($this->items);
 		$this->clean();
 
 		return $value;
@@ -275,7 +262,7 @@ class Arr
      * */
 	public function last(): mixed
     {
-		$new_arr = $this->items[self::length($this->items) - 1];
+		$new_arr = end($this->items);
 		$this->clean();
 
 		return $new_arr;
@@ -284,9 +271,9 @@ class Arr
     /**
      * Create a new array with a value inside
      * */
-	public function wrap(mixed $value): Arr
+	public function wrap(mixed $value = null): Arr
     {
-		$this->items = $value === null ? [] : [$value];
+		$this->items = empty($value) ? [] : [$value];
 
         return $this;
 	}

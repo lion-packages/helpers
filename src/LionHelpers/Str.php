@@ -64,7 +64,7 @@ class Str
     /**
      * Set the defined value as current value
      * */
-	public function of(string $word): Str
+	public function of(?string $word): Str
     {
 		$this->word = $word;
 
@@ -139,9 +139,11 @@ class Str
     {
 		if (null === $this->word) {
 			$this->word = null;
+
+            return $this;
 		}
 
-		$this->word =  empty(trim($this->word)) ? null : $this->word;
+		$this->word = empty(trim($this->word)) ? null : $this->word;
 
         return $this;
 	}

@@ -50,7 +50,10 @@ class StrTest extends Test
 
     public function testOf(): void
     {
-        $this->assertInstanceOf(Str::class, $this->str->of(self::NAME));
+        $str = $this->str->of(self::NAME);
+
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertSame($this->str, $str);
     }
 
     public function testSplit(): void
