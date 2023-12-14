@@ -11,11 +11,17 @@ class Arr
 {
 	private array|object $items = [];
 
+    /**
+     * Resets the class property to its original value
+     * */
     private function clean(): void
     {
         $this->items = [];
     }
 
+    /**
+     * Convert object to current array
+     * */
     public function toObject(): Arr
     {
         $this->items = (object) $this->items;
@@ -23,6 +29,9 @@ class Arr
         return $this;
     }
 
+    /**
+     * Get the indexes of the current array
+     * */
 	public function keys(): Arr
     {
 		$this->items = array_keys($this->items);
@@ -30,6 +39,9 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Get the values of the current array
+     * */
 	public function values(): Arr
     {
 		$this->items = array_values($this->items);
@@ -37,11 +49,17 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Gets the current value
+     * */
 	public function get(): array|object
     {
 		return $this->items;
 	}
 
+    /**
+     * Add an element to the current array
+     * */
 	public function push(mixed $value, int|string $key = ''): Arr
     {
 		if ('' === $key) {
@@ -54,6 +72,9 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Set the defined value as current value
+     * */
 	public function of(array $items): Arr
     {
 		$this->items = $items;
@@ -61,11 +82,17 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Gets the number of characters in the current string
+     * */
 	public function length(): int
     {
 		return count($this->items);
 	}
 
+    /**
+     * Joins the values of the current array in string format using the defined delimiter
+     * */
 	public function join(string $delimiter, string $str = ''): string
     {
 		$newText = '';
@@ -84,6 +111,9 @@ class Arr
 		return $newText;
 	}
 
+    /**
+     * Uses the value of a column of a matrix as the key of the same matrix
+     * */
 	public function keyBy(string $column): Arr
     {
 		$newItems = [];
@@ -101,6 +131,10 @@ class Arr
         return $this;
 	}
 
+    /**
+     * It uses the value of a column of an array as a key by creating a new
+     * array and adding all arrays that share the same column value
+     * */
 	public function tree(string $column): Arr
     {
 		$newItems = [];
@@ -126,6 +160,9 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Adds a defined value to the start of the current array
+     * */
 	public function prepend(string $item, string $key = ''): Arr
     {
 		$this->items = '' === $key ? [$item, ...$this->items] : [$key => $item, ...$this->items];
@@ -133,6 +170,9 @@ class Arr
 		return $this;
 	}
 
+    /**
+     * Select a number of random elements from an array
+     * */
 	public function random(int $cont = 1): Arr
     {
 		$size = $this->length();
@@ -168,6 +208,9 @@ class Arr
 		return $this;
 	}
 
+    /**
+     * Sorts the elements in ascending order of the values (string and numeric) of an array.
+     * */
 	public function sort(int $type): Arr
     {
 		sort($this->items, $type);
@@ -175,6 +218,9 @@ class Arr
         return $this;
 	}
 
+    /**
+     * Gets a new array of elements based on its condition
+     * */
 	public function where(Closure $callback): Arr
     {
 		$newItems = [];
@@ -190,15 +236,19 @@ class Arr
 		return $this;
 	}
 
+    /**
+     * Gets a new array of elements where the values are neither null nor empty
+     * */
 	public function whereNotNull(): Arr
     {
+        $str = new Str();
 		$newItems = [];
 
 		foreach ($this->items as $key => $item) {
 			if (in_array(gettype($item), ['array', 'object', 'closure'])) {
 				$newItems[$key] = $item;
 			} else {
-				if (Str::of($item)->toNull() != null) {
+				if ($str->of($item)->toNull() != null) {
 					$newItems[$key] = $item;
 				}
 			}
@@ -209,6 +259,9 @@ class Arr
 		return $this;
 	}
 
+    /**
+     * Gets the first element of the current array
+     * */
 	public function first(): mixed
     {
 		$value = $this->items[0];
@@ -217,6 +270,9 @@ class Arr
 		return $value;
 	}
 
+    /**
+     * Gets the last element of the current array
+     * */
 	public function last(): mixed
     {
 		$new_arr = $this->items[self::length($this->items) - 1];
@@ -225,6 +281,9 @@ class Arr
 		return $new_arr;
 	}
 
+    /**
+     * Create a new array with a value inside
+     * */
 	public function wrap(mixed $value): Arr
     {
 		$this->items = $value === null ? [] : [$value];

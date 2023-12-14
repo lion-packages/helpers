@@ -10,11 +10,17 @@ class Str
 {
 	private ?string $word = '';
 
+    /**
+     * Resets the class property to its original value
+     * */
 	private function clean(): void
     {
 		$this->word = '';
 	}
 
+    /**
+     * Replaces defined characters
+     * */
 	private function replaceChars(string $type, array $chars = []): string
     {
 		$itemDefaultChar = '';
@@ -36,7 +42,7 @@ class Str
 		array_push($chars, $itemDefaultChar);
 
 		if (count($chars) > 0) {
-			foreach ($chars as $key => $char) {
+			foreach ($chars as $char) {
 				self::replace($char, $itemReplaceChar);
 			}
 		}
@@ -44,6 +50,9 @@ class Str
 		return strtolower($this->word);
 	}
 
+    /**
+     * Gets the current value
+     * */
 	public function get(): ?string
     {
 		$word = $this->word;
@@ -52,6 +61,9 @@ class Str
 		return $word;
 	}
 
+    /**
+     * Set the defined value as current value
+     * */
 	public function of(string $word): Str
     {
 		$this->word = $word;
@@ -59,11 +71,17 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Separates the string into parts with the defined characters
+     * */
 	public function split(string $split): array
     {
 		return explode($split, $this->word);
 	}
 
+    /**
+     * Add spaces to current string
+     * */
 	public function spaces(int $spaces = 1): Str
     {
 		for ($i = 0; $i < $spaces; $i++) {
@@ -73,6 +91,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Replaces the defined value with another value in the current string
+     * */
 	public function replace($searchItem, $replaceItem): Str
     {
 		$this->word = str_replace($searchItem, $replaceItem, $this->word);
@@ -80,6 +101,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Adds the defined text to the beginning of the string
+     * */
 	public function prepend(string $prepend): Str
     {
 		$this->word = $prepend . $this->word;
@@ -87,6 +111,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Add a line break to the current string
+     * */
 	public function ln(): Str
     {
 		$this->word .=  "\n";
@@ -94,6 +121,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Add a tab to the current string
+     * */
 	public function lt(): Str
     {
 		$this->word .=  "\t";
@@ -101,6 +131,10 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Converts the current string to null or returns the same value
+     * if the current value is different from null
+     * */
 	public function toNull(): Str
     {
 		if (null === $this->word) {
@@ -112,6 +146,9 @@ class Str
         return $this;
 	}
 
+    /**
+     * Gets the text contained before the defined word
+     * */
 	public function before(string $delimiter): string
     {
 		$this->word = (new Arr())->of(explode($delimiter, $this->word))->first();
@@ -120,6 +157,9 @@ class Str
 		return null === $first ? $this->word : $first;
 	}
 
+    /**
+     * Gets the text contained after the defined word
+     * */
 	public function after(string $delimiter): string
     {
 		$this->word = (new Arr())->of(explode($delimiter, $this->word))->last();
@@ -128,13 +168,19 @@ class Str
 		return null === $last ? $this->word : $last;
 	}
 
-	public function between($first_delimiter, $second_delimiter): string
+    /**
+     * Gets the text contained between the defined words
+     * */
+	public function between($firstDelimiter, $secondDelimiter): string
     {
-		$this->word = self::after($first_delimiter);
+		$this->word = self::after($firstDelimiter);
 
-		return self::before($second_delimiter);
+		return self::before($secondDelimiter);
 	}
 
+    /**
+     * Convert current string to Camel format
+     * */
 	public function camel(): Str
     {
 		$this->word = lcfirst(str_replace(" ", '', ucwords(strtolower($this->word))));
@@ -142,6 +188,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Convert current string to Pascal format
+     * */
 	public function pascal(): Str
     {
 		$this->word = str_replace(" ", '', ucwords(strtolower($this->word)));
@@ -149,6 +198,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Convert current string to Snake format
+     * */
 	public function snake(array $chars = []): Str
     {
 		$this->word = self::replaceChars('snake', $chars);
@@ -156,6 +208,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Convert current string to Kebab format
+     * */
 	public function kebab(array $chars = []): Str
     {
 		$this->word = self::replaceChars('kebab', $chars);
@@ -163,6 +218,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Adds formatting to the current string (initial letters in uppercase)
+     * */
 	public function headline(): Str
     {
 		$this->word = ucwords(self::replaceChars('all'));
@@ -170,11 +228,18 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Gets the number of characters in the current string
+     * */
 	public function length(): int
     {
 		return strlen($this->word);
 	}
 
+    /**
+     * gets the first characters of the defined quantity of the current
+     * string as new current string
+     * */
 	public function limit(int $limit = 10): Str
     {
 		$newStr = '';
@@ -190,6 +255,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Convert current string to lowercase
+     * */
 	public function lower(): Str
     {
 		$this->word = strtolower($this->word);
@@ -197,6 +265,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Convert current string to uppercase
+     * */
 	public function upper(): Str
     {
 		$this->word = strtoupper($this->word);
@@ -204,6 +275,10 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Converts part of the string obtained in a range of characters
+     * to specific characters
+     * */
 	public function mask(string $char, int $ignore): Str
     {
 		$newStr = '';
@@ -227,6 +302,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Checks if the current string contains a certain number of defined words
+     * */
 	public function contains(array $words): bool
     {
 		foreach ($words as $key => $word) {
@@ -239,6 +317,9 @@ class Str
 		return true;
 	}
 
+    /**
+     * Replaces words in the current string with new words
+     * */
 	public function swap(array $swaps): Str
     {
 		$newStr = '';
@@ -258,11 +339,17 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Tests the current string with a regular expression
+     * */
 	public function test(string $test): bool
     {
 		return preg_match($test, $this->word);
 	}
 
+    /**
+     * Clears spaces at the beginning and end of the current string
+     * */
 	public function trim(string $trim = ''): Str
     {
 		$this->word = $trim === '' ? trim($this->word) : trim(str_replace($trim, '', $this->word));
@@ -270,6 +357,9 @@ class Str
 		return $this;
 	}
 
+    /**
+     * Concatenate strings to the current string
+     * */
 	public function concat(string $word): Str
     {
 		$this->word .= $word;
