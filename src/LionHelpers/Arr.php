@@ -1,202 +1,234 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LionHelpers;
 
+use Closure;
 use LionHelpers\Str;
 
-class Arr {
+class Arr
+{
+	private array|object $items = [];
 
-	private static ?Arr $arr = null;
-	private static ?array $items = [];
+    private function clean(): void
+    {
+        $this->items = [];
+    }
 
-	public function __construct() {
+    public function toObject(): Arr
+    {
+        $this->items = (object) $this->items;
 
+        return $this;
+    }
+
+	public function keys(): Arr
+    {
+		$this->items = array_keys($this->items);
+
+        return $this;
 	}
 
-	private static function clean(): void {
-		self::$items = [];
+	public function values(): Arr
+    {
+		$this->items = array_values($this->items);
+
+        return $this;
 	}
 
-	public static function keys(): Arr {
-		self::$items = array_keys(self::$items);
-		return self::$arr;
+	public function get(): array|object
+    {
+		return $this->items;
 	}
 
-	public static function values(): Arr {
-		self::$items = array_values(self::$items);
-		return self::$arr;
-	}
-
-	public static function get(): array {
-		return self::$items;
-	}
-
-	public static function push(mixed $value, int|string $key = ''): Arr {
-		if ($key === '') {
-			self::$items[] = $value;
+	public function push(mixed $value, int|string $key = ''): Arr
+    {
+		if ('' === $key) {
+			$this->items[] = $value;
 		} else {
-			self::$items[$key] = $value;
+			$this->items[$key] = $value;
 		}
 
-		return self::$arr;
+
+        return $this;
 	}
 
-	public static function of(array $items = []): Arr {
-		if (self::$arr === null) {
-			self::$arr = new Arr();
-		}
+	public function of(array $items): Arr
+    {
+		$this->items = $items;
 
-		self::$items = $items;
-		return self::$arr;
+        return $this;
 	}
 
-	public static function length(): int {
-		return count(self::$items);
+	public function length(): int
+    {
+		return count($this->items);
 	}
 
-	public static function join(string $delimiter, string $str = ""): string {
-		$new_text = "";
-		$size = self::length(self::$items) - 1;
+	public function join(string $delimiter, string $str = ''): string
+    {
+		$newText = '';
+		$size = self::length($this->items) - 1;
 
-		foreach (self::$items as $key => $item) {
+		foreach ($this->items as $key => $item) {
 			if ($key === 0) {
-				$new_text .= $item;
+				$newText .= $item;
 			} elseif ($key === $size) {
-				$new_text .= $str != "" ? ($str . $item) : ($delimiter . $item);
+				$newText .= $str != '' ? ($str . $item) : ($delimiter . $item);
 			} else {
-				$new_text .= ($delimiter . $item);
+				$newText .= ($delimiter . $item);
 			}
 		}
 
-		return $new_text;
+		return $newText;
 	}
 
-	public static function keyBy(string $column): array {
-		$new_items = [];
+	public function keyBy(string $column): Arr
+    {
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
-			if (gettype($item) === 'object') {
-				$new_items[$item->{"{$column}"}] = $item;
+		foreach ($this->items as $key => $item) {
+			if ('object' === gettype($item)) {
+				$newItems[$item->{"{$column}"}] = $item;
 			} else {
-				$new_items[$item[$column]] = $item;
+				$newItems[$item[$column]] = $item;
 			}
 		}
 
-		self::clean();
-		return $new_items;
+		$this->items = $newItems;
+
+        return $this;
 	}
 
-	public static function tree(string $column): array {
-		$new_items = [];
+	public function tree(string $column): Arr
+    {
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
-			if (gettype($item) === 'object') {
-				if (!isset($new_items[$item->{"{$column}"}])) {
-					$new_items[$item->{"{$column}"}] = [$item];
+		foreach ($this->items as $key => $item) {
+			if ('object' === gettype($item)) {
+				if (!isset($newItems[$item->{"{$column}"}])) {
+					$newItems[$item->{"{$column}"}] = [$item];
 				} else {
-					array_push($new_items[$item->{"{$column}"}], $item);
+					array_push($newItems[$item->{"{$column}"}], $item);
 				}
 			} else {
-				if (!isset($new_items[$item[$column]])) {
-					$new_items[$item[$column]] = [$item];
+				if (!isset($newItems[$item[$column]])) {
+					$newItems[$item[$column]] = [$item];
 				} else {
-					array_push($new_items[$item[$column]], $item);
+					array_push($newItems[$item[$column]], $item);
 				}
 			}
 		}
 
-		self::clean();
-		return $new_items;
+		$this->items = $newItems;
+
+        return $this;
 	}
 
-	public static function prepend(string $item, string $key = ""): array {
-		$new_arr = $key === "" ? [$item, ...self::$items] : [$key => $item, ...self::$items];
-		self::clean();
-		return $new_arr;
+	public function prepend(string $item, string $key = ''): Arr
+    {
+		$this->items = '' === $key ? [$item, ...$this->items] : [$key => $item, ...$this->items];
+
+		return $this;
 	}
 
-	public static  function random(int $cont = 1): mixed {
-		$size = self::length();
+	public function random(int $cont = 1): Arr
+    {
+		$size = $this->length();
 
 		if ($cont > $size) {
-			return (object) ['status' => 'error', 'message' => "element size exceeds array size"];
+			return (object) ['status' => 'error', 'message' => 'element size exceeds array size'];
 		}
 
-		$all_items = [];
-		$all_size = $size - 1;
-		$get_random_item = fn(array $items, $all_size) => $items[rand(0, $all_size)];
-		$search_item = fn(array $all_items, mixed $item) => in_array($item, $all_items);
+		$allItems = [];
+		$allSize = $size - 1;
+		$getRandomItem = fn(array $items, $allSize) => $items[rand(0, $allSize)];
+		$searchItem = fn(array $allItems, mixed $item) => in_array($item, $allItems);
 
 		if ($cont > 1) {
 			$iterate = 0;
 
 			do {
-				$item = $get_random_item(self::$items, $all_size);
+				$item = $getRandomItem($this->items, $allSize);
 
-				if (!$search_item($all_items, $item)) {
-					$all_items[] = $item;
+				if (!$searchItem($allItems, $item)) {
+					$allItems[] = $item;
 					$iterate++;
 				}
 			} while ($iterate < $cont);
 
-			self::clean();
-			return $all_items;
+			$this->items = $allItems;
+
+			return $this;
 		}
 
-		$new_arr = $get_random_item(self::$items, $all_size);
-		self::clean();
-		return $new_arr;
+		$this->items = $getRandomItem($this->items, $allSize);
+
+		return $this;
 	}
 
-	public static  function sort(int $type): Arr {
-		sort(self::$items, $type);
-		return self::$arr;
+	public function sort(int $type): Arr
+    {
+		sort($this->items, $type);
+
+        return $this;
 	}
 
-	public static  function where(\Closure $callback): array {
-		$new_items = [];
+	public function where(Closure $callback): Arr
+    {
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
+		foreach ($this->items as $key => $item) {
 			if ($callback($item, $key)) {
-				$new_items[$key] = $item;
+				$newItems[$key] = $item;
 			}
 		}
 
-		self::clean();
-		return $new_items;
+        $this->items = $newItems;
+
+		return $this;
 	}
 
-	public static function whereNotNull(): array {
-		$new_items = [];
+	public function whereNotNull(): Arr
+    {
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
+		foreach ($this->items as $key => $item) {
 			if (in_array(gettype($item), ['array', 'object', 'closure'])) {
-				$new_items[$key] = $item;
+				$newItems[$key] = $item;
 			} else {
 				if (Str::of($item)->toNull() != null) {
-					$new_items[$key] = $item;
+					$newItems[$key] = $item;
 				}
 			}
 		}
 
-		self::clean();
-		return $new_items;
+		$this->items = $newItems;
+
+		return $this;
 	}
 
-	public static function first(): mixed {
-		$new_arr = self::$items[0];
-		self::clean();
+	public function first(): mixed
+    {
+		$value = $this->items[0];
+		$this->clean();
+
+		return $value;
+	}
+
+	public function last(): mixed
+    {
+		$new_arr = $this->items[self::length($this->items) - 1];
+		$this->clean();
+
 		return $new_arr;
 	}
 
-	public static function last(): mixed {
-		$new_arr = self::$items[self::length(self::$items) - 1];
-		self::clean();
-		return $new_arr;
-	}
+	public function wrap(mixed $value): Arr
+    {
+		$this->items = $value === null ? [] : [$value];
 
-	public static function wrap(mixed $value): array {
-		return $value === null ? [] : [$value];
+        return $this;
 	}
-
 }
