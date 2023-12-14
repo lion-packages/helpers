@@ -43,7 +43,7 @@ class Str
 
 		if (count($chars) > 0) {
 			foreach ($chars as $char) {
-				self::replace($char, $itemReplaceChar);
+				$this->replace($char, $itemReplaceChar);
 			}
 		}
 
@@ -149,33 +149,34 @@ class Str
     /**
      * Gets the text contained before the defined word
      * */
-	public function before(string $delimiter): string
+	public function before(string $delimiter): Str
     {
 		$this->word = (new Arr())->of(explode($delimiter, $this->word))->first();
-		$first = self::toNull();
+		$this->toNull();
 
-		return null === $first ? $this->word : $first;
-	}
+		return $this;
+    }
 
     /**
      * Gets the text contained after the defined word
      * */
-	public function after(string $delimiter): string
+	public function after(string $delimiter): Str
     {
 		$this->word = (new Arr())->of(explode($delimiter, $this->word))->last();
-		$last = self::toNull();
+        $this->toNull();
 
-		return null === $last ? $this->word : $last;
+		return $this;
 	}
 
     /**
      * Gets the text contained between the defined words
      * */
-	public function between($firstDelimiter, $secondDelimiter): string
+	public function between($firstDelimiter, $secondDelimiter): Str
     {
-		$this->word = self::after($firstDelimiter);
+		$this->after($firstDelimiter);
+		$this->before($secondDelimiter);
 
-		return self::before($secondDelimiter);
+        return $this;
 	}
 
     /**
@@ -203,7 +204,7 @@ class Str
      * */
 	public function snake(array $chars = []): Str
     {
-		$this->word = self::replaceChars('snake', $chars);
+		$this->word = $this->replaceChars('snake', $chars);
 
 		return $this;
 	}
@@ -213,7 +214,7 @@ class Str
      * */
 	public function kebab(array $chars = []): Str
     {
-		$this->word = self::replaceChars('kebab', $chars);
+		$this->word = $this->replaceChars('kebab', $chars);
 
 		return $this;
 	}
@@ -223,7 +224,7 @@ class Str
      * */
 	public function headline(): Str
     {
-		$this->word = ucwords(self::replaceChars('all'));
+		$this->word = ucwords($this->replaceChars('all'));
 
 		return $this;
 	}
@@ -344,7 +345,7 @@ class Str
      * */
 	public function test(string $test): bool
     {
-		return preg_match($test, $this->word);
+		return (bool) preg_match($test, $this->word);
 	}
 
     /**
@@ -352,7 +353,7 @@ class Str
      * */
 	public function trim(string $trim = ''): Str
     {
-		$this->word = $trim === '' ? trim($this->word) : trim(str_replace($trim, '', $this->word));
+		$this->word = '' === $trim ? trim($this->word) : trim(str_replace($trim, '', $this->word));
 
 		return $this;
 	}
