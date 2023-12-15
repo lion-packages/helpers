@@ -1,202 +1,280 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LionHelpers;
 
+use Closure;
+use InvalidArgumentException;
 use LionHelpers\Str;
 
-class Arr {
+class Arr
+{
+	private array|object $items = [];
 
-	private static ?Arr $arr = null;
-	private static ?array $items = [];
+    /**
+     * Resets the class property to its original value
+     * */
+    private function clean(): void
+    {
+        $this->items = [];
+    }
 
-	public function __construct() {
+    /**
+     * Convert object to current array
+     * */
+    public function toObject(): Arr
+    {
+        $this->items = (object) $this->items;
 
+        return $this;
+    }
+
+    /**
+     * Get the indexes of the current array
+     * */
+	public function keys(): Arr
+    {
+		$this->items = array_keys($this->items);
+
+        return $this;
 	}
 
-	private static function clean(): void {
-		self::$items = [];
+    /**
+     * Get the values of the current array
+     * */
+	public function values(): Arr
+    {
+		$this->items = array_values($this->items);
+
+        return $this;
 	}
 
-	public static function keys(): Arr {
-		self::$items = array_keys(self::$items);
-		return self::$arr;
+    /**
+     * Gets the current value
+     * */
+	public function get(): array|object
+    {
+        $items = $this->items;
+        $this->clean();
+
+		return $items;
 	}
 
-	public static function values(): Arr {
-		self::$items = array_values(self::$items);
-		return self::$arr;
-	}
-
-	public static function get(): array {
-		return self::$items;
-	}
-
-	public static function push(mixed $value, int|string $key = ''): Arr {
-		if ($key === '') {
-			self::$items[] = $value;
+    /**
+     * Add an element to the current array
+     * */
+	public function push(mixed $value, int|string $key = ''): Arr
+    {
+		if ('' === $key) {
+			$this->items[] = $value;
 		} else {
-			self::$items[$key] = $value;
+			$this->items[$key] = $value;
 		}
 
-		return self::$arr;
+        return $this;
 	}
 
-	public static function of(array $items = []): Arr {
-		if (self::$arr === null) {
-			self::$arr = new Arr();
-		}
+    /**
+     * Set the defined value as current value
+     * */
+	public function of(array $items): Arr
+    {
+		$this->items = $items;
 
-		self::$items = $items;
-		return self::$arr;
+        return $this;
 	}
 
-	public static function length(): int {
-		return count(self::$items);
+    /**
+     * Gets the number of characters in the current string
+     * */
+	public function length(): int
+    {
+		return count($this->items);
 	}
 
-	public static function join(string $delimiter, string $str = ""): string {
-		$new_text = "";
-		$size = self::length(self::$items) - 1;
+    /**
+     * Joins the values of the current array in string format using the defined delimiter
+     * */
+	public function join(string $separator = ', ', ?string $lastSeparator = null): string
+    {
+        $items = $this->items;
+        $this->clean();
 
-		foreach (self::$items as $key => $item) {
-			if ($key === 0) {
-				$new_text .= $item;
-			} elseif ($key === $size) {
-				$new_text .= $str != "" ? ($str . $item) : ($delimiter . $item);
+        if (null === $lastSeparator) {
+            return implode($separator, $items);
+        }
+
+        $lastElement = array_pop($items);
+
+        return implode($separator, $items) . "{$lastSeparator}{$lastElement}";
+	}
+
+    /**
+     * Uses the value of a column of a matrix as the key of the same matrix
+     * */
+	public function keyBy(string $column): Arr
+    {
+		$newItems = [];
+
+		foreach ($this->items as $item) {
+			if ('object' === gettype($item)) {
+				$newItems[$item->{"{$column}"}] = $item;
 			} else {
-				$new_text .= ($delimiter . $item);
+				$newItems[$item[$column]] = $item;
 			}
 		}
 
-		return $new_text;
+		$this->items = $newItems;
+
+        return $this;
 	}
 
-	public static function keyBy(string $column): array {
-		$new_items = [];
+    /**
+     * It uses the value of a column of an array as a key by creating a new
+     * array and adding all arrays that share the same column value
+     * */
+	public function tree(string $column): Arr
+    {
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
-			if (gettype($item) === 'object') {
-				$new_items[$item->{"{$column}"}] = $item;
-			} else {
-				$new_items[$item[$column]] = $item;
-			}
-		}
-
-		self::clean();
-		return $new_items;
-	}
-
-	public static function tree(string $column): array {
-		$new_items = [];
-
-		foreach (self::$items as $key => $item) {
-			if (gettype($item) === 'object') {
-				if (!isset($new_items[$item->{"{$column}"}])) {
-					$new_items[$item->{"{$column}"}] = [$item];
+		foreach ($this->items as $key => $item) {
+			if ('object' === gettype($item)) {
+				if (!isset($newItems[$item->{"{$column}"}])) {
+					$newItems[$item->{"{$column}"}] = [$item];
 				} else {
-					array_push($new_items[$item->{"{$column}"}], $item);
+					array_push($newItems[$item->{"{$column}"}], $item);
 				}
 			} else {
-				if (!isset($new_items[$item[$column]])) {
-					$new_items[$item[$column]] = [$item];
+				if (!isset($newItems[$item[$column]])) {
+					$newItems[$item[$column]] = [$item];
 				} else {
-					array_push($new_items[$item[$column]], $item);
+					array_push($newItems[$item[$column]], $item);
 				}
 			}
 		}
 
-		self::clean();
-		return $new_items;
+		$this->items = $newItems;
+
+        return $this;
 	}
 
-	public static function prepend(string $item, string $key = ""): array {
-		$new_arr = $key === "" ? [$item, ...self::$items] : [$key => $item, ...self::$items];
-		self::clean();
-		return $new_arr;
+    /**
+     * Adds a defined value to the start of the current array
+     * */
+	public function prepend(string $item, string $key = ''): Arr
+    {
+		$this->items = '' === $key ? [$item, ...$this->items] : [$key => $item, ...$this->items];
+
+		return $this;
 	}
 
-	public static  function random(int $cont = 1): mixed {
-		$size = self::length();
+    /**
+     * Select a number of random elements from an array
+     * */
+	public function random(int $limit = 1): Arr
+    {
+		$size = $this->length();
 
-		if ($cont > $size) {
-			return (object) ['status' => 'error', 'message' => "element size exceeds array size"];
+		if ($limit > $size) {
+            throw new InvalidArgumentException('element size exceeds array size');
 		}
 
-		$all_items = [];
-		$all_size = $size - 1;
-		$get_random_item = fn(array $items, $all_size) => $items[rand(0, $all_size)];
-		$search_item = fn(array $all_items, mixed $item) => in_array($item, $all_items);
+        $randomIdxs = [];
 
-		if ($cont > 1) {
-			$iterate = 0;
+        do {
+            $randomIdx = array_rand($this->items);
 
-			do {
-				$item = $get_random_item(self::$items, $all_size);
+            if (!in_array($randomIdx, $randomIdxs, true)) {
+                $randomIdxs[] = $randomIdx;
+            }
 
-				if (!$search_item($all_items, $item)) {
-					$all_items[] = $item;
-					$iterate++;
-				}
-			} while ($iterate < $cont);
+            if (count($randomIdxs) === $limit) {
+                break;
+            }
+        } while (true);
 
-			self::clean();
-			return $all_items;
-		}
+        $randomElements = [];
 
-		$new_arr = $get_random_item(self::$items, $all_size);
-		self::clean();
-		return $new_arr;
+        foreach ($randomIdxs as $key) {
+            $randomElements[] = $this->items[$key];
+        }
+
+        $this->items = $randomElements;
+
+        return $this;
 	}
 
-	public static  function sort(int $type): Arr {
-		sort(self::$items, $type);
-		return self::$arr;
-	}
+    /**
+     * Gets a new array of elements based on its condition
+     * */
+	public function where(Closure $callback): Arr
+    {
+		$newItems = [];
 
-	public static  function where(\Closure $callback): array {
-		$new_items = [];
-
-		foreach (self::$items as $key => $item) {
+		foreach ($this->items as $key => $item) {
 			if ($callback($item, $key)) {
-				$new_items[$key] = $item;
+				$newItems[$key] = $item;
 			}
 		}
 
-		self::clean();
-		return $new_items;
+        $this->items = $newItems;
+
+		return $this;
 	}
 
-	public static function whereNotNull(): array {
-		$new_items = [];
+    /**
+     * Gets a new array of elements where the values are neither null nor empty
+     * */
+	public function whereNotEmpty(): Arr
+    {
+        $str = new Str();
+		$newItems = [];
 
-		foreach (self::$items as $key => $item) {
+		foreach ($this->items as $key => $item) {
 			if (in_array(gettype($item), ['array', 'object', 'closure'])) {
-				$new_items[$key] = $item;
+				$newItems[$key] = $item;
 			} else {
-				if (Str::of($item)->toNull() != null) {
-					$new_items[$key] = $item;
+				if (!empty($str->of($item)->toNull()->get())) {
+					$newItems[$key] = $item;
 				}
 			}
 		}
 
-		self::clean();
-		return $new_items;
+		$this->items = $newItems;
+
+		return $this;
 	}
 
-	public static function first(): mixed {
-		$new_arr = self::$items[0];
-		self::clean();
+    /**
+     * Gets the first element of the current array
+     * */
+	public function first(): mixed
+    {
+		$value = reset($this->items);
+		$this->clean();
+
+		return $value;
+	}
+
+    /**
+     * Gets the last element of the current array
+     * */
+	public function last(): mixed
+    {
+		$new_arr = end($this->items);
+		$this->clean();
+
 		return $new_arr;
 	}
 
-	public static function last(): mixed {
-		$new_arr = self::$items[self::length(self::$items) - 1];
-		self::clean();
-		return $new_arr;
-	}
+    /**
+     * Create a new array with a value inside
+     * */
+	public function wrap(mixed $value = null): Arr
+    {
+		$this->items = empty($value) ? [] : [$value];
 
-	public static function wrap(mixed $value): array {
-		return $value === null ? [] : [$value];
+        return $this;
 	}
-
 }

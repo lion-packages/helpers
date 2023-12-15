@@ -1,199 +1,317 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LionHelpers;
 
 use LionHelpers\Arr;
 
-class Str {
+class Str
+{
+	private ?string $word = '';
 
-	private static ?Str $str = null;
-	private static ?string $word;
-
-	public function __construct() {
-
+    /**
+     * Resets the class property to its original value
+     * */
+	private function clean(): void
+    {
+		$this->word = '';
 	}
 
-	private static function clean(): void {
-		self::$word = '';
-	}
-
-	private static function replaceChars(string $type, array $chars = []): string {
-		$item_default_chart = "";
-		$item_replace_chart = "";
+    /**
+     * Replaces defined characters
+     * */
+	private function replaceChars(string $type, array $chars = []): string
+    {
+		$itemDefaultChar = '';
+		$itemReplaceChar = '';
 
 		if ($type === 'kebab') {
-			$item_default_chart = "_";
-			$item_replace_chart = "-";
+			$itemDefaultChar = "_";
+			$itemReplaceChar = "-";
 			array_push($chars, ' ');
 		} elseif ($type === 'snake') {
-			$item_default_chart = "-";
-			$item_replace_chart = "_";
+			$itemDefaultChar = "-";
+			$itemReplaceChar = "_";
 			array_push($chars, ' ');
 		} else {
-			$item_replace_chart = " ";
+			$itemReplaceChar = " ";
 			array_push($chars, '-', '_', '/', '\\', '*', '+', '=', '|', '[', ']', '(', ')');
 		}
 
-		array_push($chars, $item_default_chart);
+		array_push($chars, $itemDefaultChar);
 
 		if (count($chars) > 0) {
-			foreach ($chars as $key => $char) {
-				self::replace($char, $item_replace_chart);
+			foreach ($chars as $char) {
+				$this->replace($char, $itemReplaceChar);
 			}
 		}
 
-		return strtolower(self::$word);
+		return strtolower($this->word);
 	}
 
-	public static function get(): string {
-		$new_str = self::$word;
-		self::clean();
-		return $new_str;
+    /**
+     * Gets the current value
+     * */
+	public function get(): ?string
+    {
+		$word = $this->word;
+		$this->clean();
+
+		return $word;
 	}
 
-	public static function of(mixed $word): Str {
-		self::$str = new Str();
-		self::$word = $word;
-		return self::$str;
+    /**
+     * Set the defined value as current value
+     * */
+	public function of(?string $word): Str
+    {
+		$this->word = $word;
+
+		return $this;
 	}
 
-	// ---------------------------------------------------------------------------------------------
-
-	public static function split(string $split): array {
-		return explode($split, self::$word);
+    /**
+     * Separates the string into parts with the defined characters
+     * */
+	public function split(string $split): array
+    {
+		return explode($split, $this->word);
 	}
 
-	public static function spaces(int $spaces = 1): Str {
+    /**
+     * Add spaces to current string
+     * */
+	public function spaces(int $spaces = 1): Str
+    {
 		for ($i = 0; $i < $spaces; $i++) {
-			self::$word .= " ";
+			$this->word .= " ";
 		}
 
-		return self::$str;
+		return $this;
 	}
 
-	public static function replace($search_item, $replace_item): Str {
-		self::$word = str_replace($search_item, $replace_item, self::$word);
-		return self::$str;
+    /**
+     * Replaces the defined value with another value in the current string
+     * */
+	public function replace($searchItem, $replaceItem): Str
+    {
+		$this->word = str_replace($searchItem, $replaceItem, $this->word);
+
+		return $this;
 	}
 
-	public static function prepend(string $prepend): Str {
-		self::$word = $prepend . self::$word;
-		return self::$str;
+    /**
+     * Adds the defined text to the beginning of the string
+     * */
+	public function prepend(string $prepend): Str
+    {
+		$this->word = $prepend . $this->word;
+
+		return $this;
 	}
 
-	public static function ln(): Str {
-		self::$word .=  "\n";
-		return self::$str;
+    /**
+     * Add a line break to the current string
+     * */
+	public function ln(): Str
+    {
+		$this->word .=  "\n";
+
+		return $this;
 	}
 
-	public static function lt(): Str {
-		self::$word .=  "\t";
-		return self::$str;
+    /**
+     * Add a tab to the current string
+     * */
+	public function lt(): Str
+    {
+		$this->word .=  "\t";
+
+		return $this;
 	}
 
-	public static function toString(): Str {
-		self::$word = self::$word === null ? "" : self::$word;
-		return self::$str;
-	}
+    /**
+     * Converts the current string to null or returns the same value
+     * if the current value is different from null
+     * */
+	public function toNull(): Str
+    {
+		if (null === $this->word) {
+			$this->word = null;
 
-	public static function toNull(): ?string {
-		if (self::$word === null) {
-			return null;
+            return $this;
 		}
 
-		return empty(trim(self::$word)) ? null : self::$word;
+		$this->word = empty(trim($this->word)) ? null : $this->word;
+
+        return $this;
 	}
 
-	public static function before(string $delimiter): string {
-		self::$word = Arr::of(explode($delimiter, self::$word))->first();
-		$first = self::toNull();
-		return $first === null ? self::$word : $first;
+    /**
+     * Gets the text contained before the defined word
+     * */
+	public function before(string $delimiter): Str
+    {
+		$this->word = (new Arr())->of(explode($delimiter, $this->word))->first();
+		$this->toNull();
+
+		return $this;
+    }
+
+    /**
+     * Gets the text contained after the defined word
+     * */
+	public function after(string $delimiter): Str
+    {
+		$this->word = (new Arr())->of(explode($delimiter, $this->word))->last();
+        $this->toNull();
+
+		return $this;
 	}
 
-	public static function after(string $delimiter): string {
-		self::$word = Arr::of(explode($delimiter, self::$word))->last();
-		$last = self::toNull();
-		return $last === null ? self::$word : $last;
+    /**
+     * Gets the text contained between the defined words
+     * */
+	public function between($firstDelimiter, $secondDelimiter): Str
+    {
+		$this->after($firstDelimiter);
+		$this->before($secondDelimiter);
+
+        return $this;
 	}
 
-	public static function between($first_delimiter, $second_delimiter): string {
-		self::$word = self::after($first_delimiter);
-		return self::before($second_delimiter);
+    /**
+     * Convert current string to Camel format
+     * */
+	public function camel(): Str
+    {
+		$this->word = lcfirst(str_replace(" ", '', ucwords(strtolower($this->word))));
+
+		return $this;
 	}
 
-	public static function camel(): Str {
-		self::$word = lcfirst(str_replace(" ", "", ucwords(strtolower(self::$word))));
-		return self::$str;
+    /**
+     * Convert current string to Pascal format
+     * */
+	public function pascal(): Str
+    {
+		$this->word = str_replace(" ", '', ucwords(strtolower($this->word)));
+
+		return $this;
 	}
 
-	public static function pascal(): Str {
-		self::$word = str_replace(" ", "", ucwords(strtolower(self::$word)));
-		return self::$str;
+    /**
+     * Convert current string to Snake format
+     * */
+	public function snake(array $chars = []): Str
+    {
+		$this->word = $this->replaceChars('snake', $chars);
+
+		return $this;
 	}
 
-	public static function snake(array $chars = []): Str {
-		self::$word = self::replaceChars('snake', $chars);
-		return self::$str;
+    /**
+     * Convert current string to Kebab format
+     * */
+	public function kebab(array $chars = []): Str
+    {
+		$this->word = $this->replaceChars('kebab', $chars);
+
+		return $this;
 	}
 
-	public static function kebab(array $chars = []): Str {
-		self::$word = self::replaceChars('kebab', $chars);
-		return self::$str;
+    /**
+     * Adds formatting to the current string (initial letters in uppercase)
+     * */
+	public function headline(): Str
+    {
+		$this->word = ucwords($this->replaceChars('all'));
+
+		return $this;
 	}
 
-	public static function headline(): Str {
-		self::$word = ucwords(self::replaceChars('all'));
-		return self::$str;
+    /**
+     * Gets the number of characters in the current string
+     * */
+	public function length(): int
+    {
+		return strlen($this->word);
 	}
 
-	public static function length(): int {
-		return strlen(self::$word);
-	}
-
-	public static function limit(int $limit = 10): Str {
-		$new_str = "";
-		$length = self::length();
+    /**
+     * gets the first characters of the defined quantity of the current
+     * string as new current string
+     * */
+	public function limit(int $limit = 10): Str
+    {
+		$newStr = '';
+		$length = $this->length();
 		$limit = $limit > $length ? $length : $limit;
 
 		for ($i = 0; $i < $limit; $i++) {
-			$new_str .= self::$word[$i];
+			$newStr .= $this->word[$i];
 		}
 
-		self::$word = $new_str;
-		return self::$str;
+		$this->word = $newStr;
+
+		return $this;
 	}
 
-	public static function lower(): Str {
-		self::$word = strtolower(self::$word);
-		return self::$str;
+    /**
+     * Convert current string to lowercase
+     * */
+	public function lower(): Str
+    {
+		$this->word = strtolower($this->word);
+
+		return $this;
 	}
 
-	public static function upper(): Str {
-		self::$word = strtoupper(self::$word);
-		return self::$str;
+    /**
+     * Convert current string to uppercase
+     * */
+	public function upper(): Str
+    {
+		$this->word = strtoupper($this->word);
+
+		return $this;
 	}
 
-	public static function mask(string $char, int $ignore): Str {
-		$new_str = "";
-		$size = self::length(self::$word);
-		$ignore_size = $size;
-		if ($ignore < 0) $ignore_size = $ignore_size - abs($ignore);
+    /**
+     * Converts part of the string obtained in a range of characters
+     * to specific characters
+     * */
+	public function mask(string $char, int $ignore): Str
+    {
+		$newStr = '';
+		$size = $this->length();
+		$ignoreSize = $size;
+
+		if ($ignore < 0) {
+            $ignoreSize = $ignoreSize - abs($ignore);
+        }
 
 		for ($i = 0; $i < $size; $i++) {
 			if ($ignore > 0) {
-				$new_str .= $i < $ignore ? self::$word[$i] : $char;
+				$newStr .= $i < $ignore ? $this->word[$i] : $char;
 			} else {
-				$new_str .= $i < $ignore_size ? $char : self::$word[$i];
+				$newStr .= $i < $ignoreSize ? $char : $this->word[$i];
 			}
 		}
 
-		self::$word = $new_str;
-		return self::$str;
+		$this->word = $newStr;
+
+		return $this;
 	}
 
-	public static function contains(array $words): bool {
+    /**
+     * Checks if the current string contains a certain number of defined words
+     * */
+	public function contains(array $words): bool
+    {
 		foreach ($words as $key => $word) {
-			if(!preg_match("/{$word}/i", self::$word)) {
+			if(!preg_match("/{$word}/i", $this->word)) {
 				return false;
 				break;
 			}
@@ -202,35 +320,53 @@ class Str {
 		return true;
 	}
 
-	public static function swap(array $swaps): Str {
-		$new_str = "";
+    /**
+     * Replaces words in the current string with new words
+     * */
+	public function swap(array $swaps): Str
+    {
+		$newStr = '';
 		$i = 0;
 
 		foreach ($swaps as $key => $swap) {
 			if ($i === 0) {
 				$i++;
-				$new_str = str_replace($key, $swap, self::$word);
+				$newStr = str_replace($key, $swap, $this->word);
 			} else {
-				$new_str = str_replace($key, $swap, $new_str);
+				$newStr = str_replace($key, $swap, $newStr);
 			}
 		}
 
-		self::$word = $new_str;
-		return self::$str;
+		$this->word = $newStr;
+
+		return $this;
 	}
 
-	public static function test(string $test): bool {
-		return preg_match($test, self::$word);
+    /**
+     * Tests the current string with a regular expression
+     * */
+	public function test(string $test): bool
+    {
+		return (bool) preg_match($test, $this->word);
 	}
 
-	public static function trim(string $trim = ""): Str {
-		self::$word = $trim === "" ? trim(self::$word) : trim(str_replace($trim, "", self::$word));
-		return self::$str;
+    /**
+     * Clears spaces at the beginning and end of the current string
+     * */
+	public function trim(string $trim = ''): Str
+    {
+		$this->word = '' === $trim ? trim($this->word) : trim(str_replace($trim, '', $this->word));
+
+		return $this;
 	}
 
-	public static function concat(string $word): Str {
-		self::$word .= $word;
-		return self::$str;
-	}
+    /**
+     * Concatenate strings to the current string
+     * */
+	public function concat(string $word): Str
+    {
+		$this->word .= $word;
 
+		return $this;
+	}
 }

@@ -16,10 +16,10 @@
 </p>
 
 ## Install
-```shell
+```bash
 composer require lion/helpers
 ```
 
 ## License
 
-The Lion-Helpers library is open source software licensed under the [MIT License](https://github.com/Sleon4/Lion-Helpers/blob/main/LICENSE).
+The <strong>helpers</strong> library is open source software licensed under the [MIT License](https://github.com/lion-packages/helpers/blob/main/LICENSE).
