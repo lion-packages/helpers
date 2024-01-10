@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use LionHelpers\Str;
-use LionTest\Test;
+use Lion\Test\Test;
+use Lion\Helpers\Str;
 use Tests\Providers\StrProviderTrait;
 
 class StrTest extends Test
