@@ -7,7 +7,7 @@ namespace Tests;
 use Closure;
 use InvalidArgumentException;
 use Lion\Test\Test;
-use LionHelpers\Arr;
+use Lion\Helpers\Arr;
 use Tests\Providers\ArrProviderTrait;
 
 class ArrTest extends Test
