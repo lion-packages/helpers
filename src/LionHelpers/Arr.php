@@ -105,6 +105,10 @@ class Arr
             return implode($separator, $items);
         }
 
+        if (count($items) <= 1) {
+            return implode($separator, $items);
+        }
+
         $lastElement = array_pop($items);
 
         return implode($separator, $items) . "{$lastSeparator}{$lastElement}";

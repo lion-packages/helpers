@@ -52,6 +52,12 @@ trait ArrProviderTrait
                 'separator' => ', ',
                 'lastSeparator' => null,
                 'return' => 'root'
+            ],
+            [
+                'elements' => self::NAMES,
+                'separator' => ', ',
+                'lastSeparator' => ' and ',
+                'return' => 'root'
             ]
         ];
     }
