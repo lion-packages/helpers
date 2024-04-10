@@ -8,13 +8,27 @@ use Closure;
 use InvalidArgumentException;
 use Lion\Helpers\Str;
 
+/**
+ * Modify and build arrays with different indexes or values.
+ *
+ * @var array|object $items [Array containing current values]
+ *
+ * @package Lion\Helpers
+ */
 class Arr
 {
+    /**
+     * [Array containing current values]
+     *
+     * @var array|object $items
+     */
     private array|object $items = [];
 
     /**
      * Resets the class property to its original value
-     * */
+     *
+     * @return void
+     */
     private function clean(): void
     {
         $this->items = [];
@@ -22,7 +36,9 @@ class Arr
 
     /**
      * Convert object to current array
-     * */
+     *
+     * @return Arr
+     */
     public function toObject(): Arr
     {
         $this->items = (object) $this->items;
@@ -32,7 +48,9 @@ class Arr
 
     /**
      * Get the indexes of the current array
-     * */
+     *
+     * @return Arr
+     */
     public function keys(): Arr
     {
         $this->items = array_keys($this->items);
@@ -42,7 +60,9 @@ class Arr
 
     /**
      * Get the values of the current array
-     * */
+     *
+     * @return Arr
+     */
     public function values(): Arr
     {
         $this->items = array_values($this->items);
@@ -52,10 +72,13 @@ class Arr
 
     /**
      * Gets the current value
-     * */
+     *
+     * @return array|object
+     */
     public function get(): array|object
     {
         $items = $this->items;
+
         $this->clean();
 
         return $items;
@@ -63,7 +86,12 @@ class Arr
 
     /**
      * Add an element to the current array
-     * */
+     *
+     * @param mixed $value [Value added to the array]
+     * @param int|string $key [Index with which the value is added to the array]
+     *
+     * @return Arr
+     */
     public function push(mixed $value, int|string $key = ''): Arr
     {
         if ('' === $key) {
@@ -77,7 +105,11 @@ class Arr
 
     /**
      * Set the defined value as current value
-     * */
+     *
+     * @param array $items [Array containing current values]
+     *
+     * @return Arr
+     */
     public function of(array $items): Arr
     {
         $this->items = $items;
@@ -87,18 +119,28 @@ class Arr
 
     /**
      * Gets the number of characters in the current string
-     * */
+     *
+     * @return int
+     */
     public function length(): int
     {
         return count($this->items);
     }
 
     /**
-     * Joins the values of the current array in string format using the defined delimiter
-     * */
+     * Joins the values of the current array in string format using the defined
+     * delimiter
+     *
+     * @param string $separator [Text that separates the texts in the string]
+     * @param null|string $lastSeparator [Text that separates the texts in the
+     * string in the last part]
+     *
+     * @return string
+     */
     public function join(string $separator = ', ', ?string $lastSeparator = null): string
     {
         $items = $this->items;
+
         $this->clean();
 
         if (null === $lastSeparator) {
@@ -116,7 +158,11 @@ class Arr
 
     /**
      * Uses the value of a column of a matrix as the key of the same matrix
-     * */
+     *
+     * @param string $column [Column name]
+     *
+     * @return Arr
+     */
     public function keyBy(string $column): Arr
     {
         $newItems = [];
@@ -137,7 +183,11 @@ class Arr
     /**
      * It uses the value of a column of an array as a key by creating a new
      * array and adding all arrays that share the same column value
-     * */
+     *
+     * @param string $column [Column name]
+     *
+     * @return Arr
+     */
     public function tree(string $column): Arr
     {
         $newItems = [];
@@ -165,17 +215,26 @@ class Arr
 
     /**
      * Adds a defined value to the start of the current array
-     * */
-    public function prepend(string $item, string $key = ''): Arr
+     *
+     * @param string $value [Value to add to current array]
+     * @param string $key [Index to add to current array]
+     *
+     * @return Arr
+     */
+    public function prepend(string $value, string $key = ''): Arr
     {
-        $this->items = '' === $key ? [$item, ...$this->items] : [$key => $item, ...$this->items];
+        $this->items = '' === $key ? [$value, ...$this->items] : [$key => $value, ...$this->items];
 
         return $this;
     }
 
     /**
      * Select a number of random elements from an array
-     * */
+     *
+     * @param int $limit [Number of elements obtained from the current array]
+     *
+     * @return Arr
+     */
     public function random(int $limit = 1): Arr
     {
         $size = $this->length();
@@ -211,7 +270,12 @@ class Arr
 
     /**
      * Gets a new array of elements based on its condition
-     * */
+     *
+     * @param Closure $callback [Executes a function that determines whether an
+     * element is added to the current array]
+     *
+     * @return Arr
+     */
     public function where(Closure $callback): Arr
     {
         $newItems = [];
@@ -229,7 +293,9 @@ class Arr
 
     /**
      * Gets a new array of elements where the values are neither null nor empty
-     * */
+     *
+     * @return Arr
+     */
     public function whereNotEmpty(): Arr
     {
         $str = new Str();
@@ -252,10 +318,13 @@ class Arr
 
     /**
      * Gets the first element of the current array
-     * */
+     *
+     * @return mixed
+     */
     public function first(): mixed
     {
         $value = reset($this->items);
+
         $this->clean();
 
         return $value;
@@ -263,10 +332,13 @@ class Arr
 
     /**
      * Gets the last element of the current array
-     * */
+     *
+     * @return mixed
+     */
     public function last(): mixed
     {
         $new_arr = end($this->items);
+
         $this->clean();
 
         return $new_arr;
@@ -274,7 +346,11 @@ class Arr
 
     /**
      * Create a new array with a value inside
-     * */
+     *
+     * @param mixed $value [Value that is added to the current array]
+     *
+     * @return Arr
+     */
     public function wrap(mixed $value = null): Arr
     {
         $this->items = empty($value) ? [] : [$value];
