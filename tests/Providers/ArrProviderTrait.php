@@ -6,19 +6,19 @@ namespace Tests\Providers;
 
 trait ArrProviderTrait
 {
-    const ROOT = 'root';
-    const DEV = 'dev';
-    const LIMIT = 10;
-    const LENGTH = 1;
-    const ONE = self::LENGTH;
-    const TWO = 2;
-    const THREE = 3;
-    const NAMES = ['name' => 'root'];
-    const NAMES_PUSH = ['name' => 'root', 'username' => 'dev'];
-    const NAMES_JOINS = ['name' => 'root', 'username' => 'dev', 'test' => 'testing'];
-    const ELEMENTS = [9, 1, 5, 6, 4, 2, 8, 0, 3, 7];
-    const ELEMENTS_WHERE_NOT_EMPTY = ['', null, self::ROOT, self::DEV];
-    const ELEMENTS_WHERE_NOT_EMPTY_FILTER = [2 => self::ROOT, 3 => self::DEV];
+    private const string ROOT = 'root';
+    private const string DEV = 'dev';
+    private const int LIMIT = 10;
+    private const int LENGTH = 1;
+    private const int ONE = self::LENGTH;
+    private const int TWO = 2;
+    private const int THREE = 3;
+    private const array NAMES = ['name' => 'root'];
+    private const array NAMES_PUSH = ['name' => 'root', 'username' => 'dev'];
+    private const array NAMES_JOINS = ['name' => 'root', 'username' => 'dev', 'test' => 'testing'];
+    private const array ELEMENTS = [9, 1, 5, 6, 4, 2, 8, 0, 3, 7];
+    private const array ELEMENTS_WHERE_NOT_EMPTY = ['', null, self::ROOT, self::DEV];
+    private const array ELEMENTS_WHERE_NOT_EMPTY_FILTER = [2 => self::ROOT, 3 => self::DEV];
 
     public static function joinProvider(): array
     {

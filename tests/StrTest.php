@@ -6,35 +6,36 @@ namespace Tests;
 
 use Lion\Test\Test;
 use Lion\Helpers\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Providers\StrProviderTrait;
 
 class StrTest extends Test
 {
     use StrProviderTrait;
 
-    const NAME = 'root';
-    const NAME_REPLACE = 'dev';
-    const PREPEND = 'lion-';
-    const LENGHT = 4;
-    const LN = "\n";
-    const LT = "\t";
-    const DESCRIPTION = 'hello lion - lion/helpers';
-    const DESCRIPTION_SWAP = 'hi dev - dev/test';
-    const BEFORE = 'hello lion ';
-    const AFTER = ' lion/helpers';
-    const BETWEEN = ' lion - lion/';
-    const HELLO = 'hello';
-    const HELPERS = 'helpers';
-    const CAMEL = 'lionRoot';
-    const PASCAL = 'LionRoot';
-    const SNAKE = 'lion_root';
-    const KEBAB = 'lion-root';
-    const HEADLINE = 'Lion Root';
-    const LIMIT = 'ro';
-    const LOWER = 'lion';
-    const UPPER = 'LION';
-    const SWAP_REPLACE = ['hello' => 'hi', 'helpers' => 'test', 'lion' => 'dev'];
-    const TRIM = ' ' . self::DESCRIPTION . ' ';
+    private const string NAME = 'root';
+    private const string NAME_REPLACE = 'dev';
+    private const string PREPEND = 'lion-';
+    private const int LENGHT = 4;
+    private const string LN = "\n";
+    private const string LT = "\t";
+    private const string DESCRIPTION = 'hello lion - lion/helpers';
+    private const string DESCRIPTION_SWAP = 'hi dev - dev/test';
+    private const string BEFORE = 'hello lion ';
+    private const string AFTER = ' lion/helpers';
+    private const string BETWEEN = ' lion - lion/';
+    private const string HELLO = 'hello';
+    private const string HELPERS = 'helpers';
+    private const string CAMEL = 'lionRoot';
+    private const string PASCAL = 'LionRoot';
+    private const string SNAKE = 'lion_root';
+    private const string KEBAB = 'lion-root';
+    private const string HEADLINE = 'Lion Root';
+    private const string LIMIT = 'ro';
+    private const string LOWER = 'lion';
+    private const string UPPER = 'LION';
+    private const array SWAP_REPLACE = ['hello' => 'hi', 'helpers' => 'test', 'lion' => 'dev'];
+    private const string TRIM = ' ' . self::DESCRIPTION . ' ';
 
     private Str $str;
 
@@ -215,9 +216,7 @@ class StrTest extends Test
         $this->assertSame(self::UPPER, $str);
     }
 
-    /**
-     * @dataProvider maskProvider
-     * */
+    #[DataProvider('maskProvider')]
     public function testMaskInit(string $value, string $char, int $length, string $return): void
     {
         $str = $this->str->of($value)->mask($char, $length)->get();
@@ -226,9 +225,7 @@ class StrTest extends Test
         $this->assertSame($return, $str);
     }
 
-    /**
-     * @dataProvider containsProvider
-     * */
+    #[DataProvider('containsProvider')]
     public function testContains(array $words, bool $return): void
     {
         $validate = $this->str->of(self::DESCRIPTION)->contains($words);
@@ -245,9 +242,7 @@ class StrTest extends Test
         $this->assertSame(self::DESCRIPTION_SWAP, $str);
     }
 
-    /**
-     * @dataProvider t3stProvider
-     * */
+    #[DataProvider('t3stProvider')]
     public function testTest(string $value, string $expr, bool $return): void
     {
         $validate = $this->str->of($value)->test($expr);
@@ -256,9 +251,7 @@ class StrTest extends Test
         $this->assertSame($return, $validate);
     }
 
-    /**
-     * @dataProvider trimProvider
-     * */
+    #[DataProvider('trimProvider')]
     public function testTrim(string $desc, string $return, string $replace): void
     {
         $str = $this->str->of($desc)->trim($replace)->get();
@@ -267,9 +260,7 @@ class StrTest extends Test
         $this->assertSame($return, $str);
     }
 
-    /**
-     * @dataProvider concatProvider
-     * */
+    #[DataProvider('concatProvider')]
     public function testConcat(string $desc, string $concat, string $return): void
     {
         $str = $this->str->of($desc)->spaces()->concat($concat)->get();
