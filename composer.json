@@ -1,6 +1,6 @@
 {
     "name": "lion/helpers",
-    "description": "easy to use helpers for any type of use",
+    "description": "Easy to use helpers for any type of use",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -14,10 +14,10 @@
         }
     },
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.3"
     },
     "require-dev": {
-        "lion/test": "^1.4",
-        "phpunit/phpunit": "^10.5"
+        "lion/test": "^2.0",
+        "phpunit/phpunit": "^11.2"
     }
 }

@@ -8,34 +8,34 @@ use Closure;
 use InvalidArgumentException;
 use Lion\Test\Test;
 use Lion\Helpers\Arr;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Providers\ArrProviderTrait;
 
 class ArrTest extends Test
 {
     use ArrProviderTrait;
 
-    const ID = 'id';
-
-    const VALUES = ['root'];
-    const KEYS_NAMES = ['name'];
-    const USERNAME = 'username';
-    const DEV = 'dev';
-    const TESTING = 'testing';
-    const TEST = 'test';
-    const AAA = 'AAA';
-    const ABA = 'ABA';
-    const ACA = 'ACA';
-    const KEY_LIST = [
+    private const string ID = 'id';
+    private const array VALUES = ['root'];
+    private const array KEYS_NAMES = ['name'];
+    private const string USERNAME = 'username';
+    private const string DEV = 'dev';
+    private const string TESTING = 'testing';
+    private const string TEST = 'test';
+    private const string AAA = 'AAA';
+    private const string ABA = 'ABA';
+    private const string ACA = 'ACA';
+    private const array KEY_LIST = [
         [self::ID => self::AAA, ...self::NAMES_JOINS],
         [self::ID => self::ABA, ...self::NAMES_JOINS],
         [self::ID => self::ACA, ...self::NAMES_JOINS]
     ];
-    const KEY_BY_LIST = [
+    private const array KEY_BY_LIST = [
         self::AAA => [self::ID => self::AAA, ...self::NAMES_JOINS],
         self::ABA => [self::ID => self::ABA, ...self::NAMES_JOINS],
         self::ACA => [self::ID => self::ACA, ...self::NAMES_JOINS]
     ];
-    const TREE_LIST = [
+    private const array TREE_LIST = [
         [self::ID => self::AAA, ...self::NAMES_JOINS],
         [self::ID => self::ABA, ...self::NAMES_JOINS],
         [self::ID => self::ACA, ...self::NAMES_JOINS],
@@ -43,7 +43,7 @@ class ArrTest extends Test
         [self::ID => self::ABA, ...self::NAMES_JOINS],
         [self::ID => self::ACA, ...self::NAMES_JOINS]
     ];
-    const TREE_BY_LIST = [
+    private const array TREE_BY_LIST = [
         self::AAA => [
             [self::ID => self::AAA, ...self::NAMES_JOINS],
             [self::ID => self::AAA, ...self::NAMES_JOINS]
@@ -120,9 +120,7 @@ class ArrTest extends Test
         $this->assertSame(self::LENGTH, $length);
     }
 
-    /**
-     * @dataProvider joinProvider
-     * */
+    #[DataProvider('joinProvider')]
     public function testJoin(array $elements, string $separator, ?string $lastSeparator, string $return): void
     {
         $str = $this->arr->of($elements)->join($separator, $lastSeparator);
@@ -158,9 +156,7 @@ class ArrTest extends Test
         $this->assertSame(self::DEV, $arr['developer']);
     }
 
-    /**
-     * @dataProvider randomProvider
-     * */
+    #[DataProvider('randomProvider')]
     public function testRandom(array $list, int $limit): void
     {
         $arr = $this->arr->of($list)->random($limit)->get();
@@ -184,9 +180,7 @@ class ArrTest extends Test
         $this->arr->of([self::ROOT])->random(self::LIMIT)->get();
     }
 
-    /**
-     * @dataProvider whereProvider
-     * */
+    #[DataProvider('whereProvider')]
     public function testWhere(array $return, Closure $callback): void
     {
         $arr = $this->arr->of(self::ELEMENTS)->where($callback)->get();
@@ -213,9 +207,7 @@ class ArrTest extends Test
         $this->assertSame(self::DEV, $this->arr->of(self::NAMES_PUSH)->last());
     }
 
-    /**
-     * @dataProvider wrapProvider
-     * */
+    #[DataProvider('wrapProvider')]
     public function testWrap(mixed $value, array $return): void
     {
         $arr = $this->arr->wrap($value)->get();
