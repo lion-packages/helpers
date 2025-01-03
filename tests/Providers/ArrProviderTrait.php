@@ -88,33 +88,33 @@ trait ArrProviderTrait
                     0 => 9,
                     3 => 6,
                     6 => 8,
-                    9 => 7
+                    9 => 7,
                 ],
-                'callback' => fn($value) => $value > 5
+                'callback' => fn($value) => $value > 5,
             ],
             [
                 'return' => [
                     6 => 8,
-                    9 => 7
+                    9 => 7,
                 ],
-                'callback' => fn($value, $key) => $key > 4 && $value > 5
+                'callback' => fn($value, $key) => $key > 4 && $value > 5,
             ],
             [
                 'return' => [
                     0 => 9,
                     3 => 6,
                     6 => 8,
-                    9 => 7
+                    9 => 7,
                 ],
-                'callback' => static fn($value) => $value > 5
+                'callback' => static fn($value) => $value > 5,
             ],
             [
                 'return' => [
                     6 => 8,
-                    9 => 7
+                    9 => 7,
                 ],
-                'callback' => static fn($value, $key) => $key > 4 && $value > 5
-            ]
+                'callback' => static fn($value, $key) => $key > 4 && $value > 5,
+            ],
         ];
     }
 

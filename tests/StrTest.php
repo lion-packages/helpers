@@ -35,7 +35,6 @@ class StrTest extends Test
     private const string LOWER = 'lion';
     private const string UPPER = 'LION';
     private const array SWAP_REPLACE = ['hello' => 'hi', 'helpers' => 'test', 'lion' => 'dev'];
-    private const string TRIM = ' ' . self::DESCRIPTION . ' ';
 
     private Str $str;
 
