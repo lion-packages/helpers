@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lion\Helpers;
 
-use Lion\Helpers\Arr;
+use InvalidArgumentException;
 
 /**
  * Modify and construct strings with different formats
@@ -20,7 +20,7 @@ class Str
      *
      * @const CHARACTER_LIMIT
      */
-    private const CHARACTER_LIMIT = 10;
+    private const int CHARACTER_LIMIT = 10;
 
     /**
      * [Take the constructed text]
@@ -60,12 +60,19 @@ class Str
     /**
      * Separates the string into parts with the defined characters
      *
-     * @param string $split [Character that separates the string into parts]
+     * @param non-empty-string $split [Character that separates the string into
+     * parts]
      *
-     * @return array<string>
+     * @return array<int, string>
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function split(string $split): array
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         return explode($split, $this->word);
     }
 
@@ -79,8 +86,12 @@ class Str
      */
     public function spaces(int $spaces = 1): Str
     {
+        if (null === $this->word) {
+            $this->word = '';
+        }
+
         for ($i = 0; $i < $spaces; $i++) {
-            $this->word .= " ";
+            $this->word .= ' ';
         }
 
         return $this;
@@ -93,9 +104,15 @@ class Str
      * @param string $replaceItem [Text to replace string with another string]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function replace(string $searchItem, string $replaceItem): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = str_replace($searchItem, $replaceItem, $this->word);
 
         return $this;
@@ -123,6 +140,10 @@ class Str
      */
     public function ln(): Str
     {
+        if (null === $this->word) {
+            $this->word = '';
+        }
+
         $this->word .=  "\n";
 
         return $this;
@@ -135,6 +156,10 @@ class Str
      */
     public function lt(): Str
     {
+        if (null === $this->word) {
+            $this->word = '';
+        }
+
         $this->word .=  "\t";
 
         return $this;
@@ -148,13 +173,9 @@ class Str
      */
     public function toNull(): Str
     {
-        if (null === $this->word) {
+        if (empty($this->word)) {
             $this->word = null;
-
-            return $this;
         }
-
-        $this->word = empty(trim($this->word)) ? null : $this->word;
 
         return $this;
     }
@@ -162,14 +183,23 @@ class Str
     /**
      * Gets the text contained before the defined word
      *
-     * @param string $delimiter [Defines the text that is returned before other
-     * text]
+     * @param non-empty-string $delimiter [Defines the text that is returned
+     * before other text]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function before(string $delimiter): Str
     {
-        $this->word = (new Arr())->of(explode($delimiter, $this->word))->first();
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
+        /** @var string $first */
+        $first = (new Arr())->of(explode($delimiter, $this->word))->first();
+
+        $this->word = $first;
 
         $this->toNull();
 
@@ -179,14 +209,23 @@ class Str
     /**
      * Gets the text contained after the defined word
      *
-     * @param string $delimiter [Defines the text that is obtained after other
-     * text]
+     * @param non-empty-string $delimiter [Defines the text that is obtained
+     * after other text]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function after(string $delimiter): Str
     {
-        $this->word = (new Arr())->of(explode($delimiter, $this->word))->last();
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
+        /** @var string $last */
+        $last = (new Arr())->of(explode($delimiter, $this->word))->last();
+
+        $this->word = $last;
 
         $this->toNull();
 
@@ -196,10 +235,10 @@ class Str
     /**
      * Gets the text contained between the defined words
      *
-     * @param string $after [Defines the text that is obtained after
+     * @param non-empty-string $after [Defines the text that is obtained after
      * other text]
-     * @param string $before [Defines the text that is returned before other
-     * text]
+     * @param non-empty-string $before [Defines the text that is returned before
+     * other text]
      *
      * @return Str
      */
@@ -216,10 +255,16 @@ class Str
      * Convert current string to Camel format
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function camel(): Str
     {
-        $this->word = lcfirst(str_replace(" ", '', ucwords(strtolower($this->word))));
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
+        $this->word = lcfirst(str_replace(' ', '', ucwords(strtolower($this->word))));
 
         return $this;
     }
@@ -228,9 +273,15 @@ class Str
      * Convert current string to Pascal format
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function pascal(): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = str_replace(" ", '', ucwords(strtolower($this->word)));
 
         return $this;
@@ -239,7 +290,7 @@ class Str
     /**
      * Convert current string to Snake format
      *
-     * @param array<string> $chars [List of characters to be removed]
+     * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return Str
      */
@@ -253,7 +304,7 @@ class Str
     /**
      * Convert current string to Kebab format
      *
-     * @param array<string> $chars [List of characters to be removed]
+     * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return Str
      */
@@ -280,9 +331,15 @@ class Str
      * Gets the number of characters in the current string
      *
      * @return int
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function length(): int
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         return strlen($this->word);
     }
 
@@ -293,14 +350,20 @@ class Str
      * @param int $limit [Limit of obtained characters]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function limit(int $limit = self::CHARACTER_LIMIT): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $newStr = '';
 
         $length = $this->length();
 
-        $limit = $limit > $length ? $length : $limit;
+        $limit = min($limit, $length);
 
         for ($i = 0; $i < $limit; $i++) {
             $newStr .= $this->word[$i];
@@ -315,9 +378,15 @@ class Str
      * Convert current string to lowercase
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function lower(): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = strtolower($this->word);
 
         return $this;
@@ -327,9 +396,15 @@ class Str
      * Convert current string to uppercase
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function upper(): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = strtoupper($this->word);
 
         return $this;
@@ -343,9 +418,15 @@ class Str
      * @param int $ignore [Number of characters ignored]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function mask(string $char = '*', int $ignore = self::CHARACTER_LIMIT): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $newStr = '';
 
         $size = $this->length();
@@ -372,17 +453,21 @@ class Str
     /**
      * Checks if the current string contains a certain number of defined words
      *
-     * @param array<string> $words [List of words]
+     * @param array<int, string> $words [List of words]
      *
      * @return bool
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function contains(array $words): bool
     {
-        foreach ($words as $word) {
-            if (!((bool) preg_match("/{$word}/i", $this->word))) {
-                return false;
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
 
-                break;
+        foreach ($words as $word) {
+            if (!(preg_match("/{$word}/i", $this->word))) {
+                return false;
             }
         }
 
@@ -395,9 +480,15 @@ class Str
      * @param array<string, string> $swaps [List of words]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function swap(array $swaps): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $newStr = '';
 
         $i = 0;
@@ -423,9 +514,15 @@ class Str
      * @param string $test [Regular expression for validation]
      *
      * @return bool
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function test(string $test): bool
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         return (bool) preg_match($test, $this->word);
     }
 
@@ -435,10 +532,18 @@ class Str
      * @param string $replace [Remove a value from the string]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
      */
     public function trim(string $replace = ''): Str
     {
-        $this->word = '' === $replace ? trim($this->word) : trim(str_replace($replace, '', $this->word));
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
+        $this->word = '' === $replace
+            ? trim($this->word)
+            : trim(str_replace($replace, '', $this->word));
 
         return $this;
     }
@@ -472,7 +577,7 @@ class Str
      *
      * @param string $type [Defines the type of format (Pascal, Camel, Snake,
      * Kebab)]
-     * @param array $chars [List of characters to be removed]
+     * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return string
      */
@@ -480,32 +585,30 @@ class Str
     {
         $itemDefaultChar = '';
 
-        $itemReplaceChar = '';
-
         if ($type === 'kebab') {
             $itemDefaultChar = "_";
 
             $itemReplaceChar = "-";
 
-            array_push($chars, ' ');
+            $chars[] = ' ';
         } elseif ($type === 'snake') {
             $itemDefaultChar = "-";
 
             $itemReplaceChar = "_";
 
-            array_push($chars, ' ');
+            $chars[] = ' ';
         } else {
             $itemReplaceChar = " ";
 
             array_push($chars, '-', '_', '/', '\\', '*', '+', '=', '|', '[', ']', '(', ')');
         }
 
-        array_push($chars, $itemDefaultChar);
+        $chars[] = $itemDefaultChar;
 
         foreach ($chars as $char) {
             $this->replace($char, $itemReplaceChar);
         }
 
-        return strtolower($this->word);
+        return strtolower((string) $this->word);
     }
 }

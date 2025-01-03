@@ -7,6 +7,8 @@ namespace Tests;
 use Lion\Test\Test;
 use Lion\Helpers\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test as Testing;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\Providers\StrProviderTrait;
 
 class StrTest extends Test
@@ -35,7 +37,6 @@ class StrTest extends Test
     private const string LOWER = 'lion';
     private const string UPPER = 'LION';
     private const array SWAP_REPLACE = ['hello' => 'hi', 'helpers' => 'test', 'lion' => 'dev'];
-    private const string TRIM = ' ' . self::DESCRIPTION . ' ';
 
     private Str $str;
 
@@ -44,12 +45,14 @@ class StrTest extends Test
         $this->str = new Str();
     }
 
-    public function testGet(): void
+    #[Testing]
+    public function get(): void
     {
         $this->assertSame(self::NAME, $this->str->of(self::NAME)->get());
     }
 
-    public function testOf(): void
+    #[Testing]
+    public function of(): void
     {
         $str = $this->str->of(self::NAME);
 
@@ -57,7 +60,8 @@ class StrTest extends Test
         $this->assertSame($this->str, $str);
     }
 
-    public function testSplit(): void
+    #[Testing]
+    public function split(): void
     {
         $list = $this->str->of(self::NAME)->split(' ');
 
@@ -65,7 +69,8 @@ class StrTest extends Test
         $this->assertSame([self::NAME], $list);
     }
 
-    public function testSpaces(): void
+    #[Testing]
+    public function spaces(): void
     {
         $str = $this->str->of(self::NAME)->spaces()->get();
 
@@ -73,7 +78,8 @@ class StrTest extends Test
         $this->assertSame(self::NAME . ' ', $str);
     }
 
-    public function testReplace(): void
+    #[Testing]
+    public function replace(): void
     {
         $str = $this->str->of(self::NAME)->replace(self::NAME, self::NAME_REPLACE)->get();
 
@@ -81,7 +87,8 @@ class StrTest extends Test
         $this->assertSame(self::NAME_REPLACE, $str);
     }
 
-    public function testPrepend(): void
+    #[Testing]
+    public function prepend(): void
     {
         $str = $this->str->of(self::NAME)->prepend(self::PREPEND)->get();
 
@@ -89,7 +96,8 @@ class StrTest extends Test
         $this->assertSame(self::PREPEND . self::NAME, $str);
     }
 
-    public function testLn(): void
+    #[Testing]
+    public function ln(): void
     {
         $str = $this->str->of(self::NAME)->ln()->get();
 
@@ -97,7 +105,8 @@ class StrTest extends Test
         $this->assertStringContainsString(self::LN, $str);
     }
 
-    public function testLt(): void
+    #[Testing]
+    public function lt(): void
     {
         $str = $this->str->of(self::NAME)->lt()->get();
 
@@ -105,14 +114,18 @@ class StrTest extends Test
         $this->assertStringContainsString(self::LT, $str);
     }
 
-    public function testToNull(): void
+    #[Testing]
+    #[TestWith(['of' => null])]
+    #[TestWith(['of' => ''])]
+    public function toNull(?string $of): void
     {
-        $str = $this->str->toNull()->get();
+        $str = $this->str->of($of)->toNull()->get();
 
         $this->assertNull($str);
     }
 
-    public function testToNullWithString(): void
+    #[Testing]
+    public function toNullWithString(): void
     {
         $str = $this->str->of(self::NAME)->toNull()->get();
 
@@ -120,7 +133,8 @@ class StrTest extends Test
         $this->assertSame(self::NAME, $str);
     }
 
-    public function testBefore(): void
+    #[Testing]
+    public function before(): void
     {
         $str = $this->str->of(self::DESCRIPTION)->before('-')->get();
 
@@ -128,7 +142,8 @@ class StrTest extends Test
         $this->assertSame(self::BEFORE, $str);
     }
 
-    public function testAfter(): void
+    #[Testing]
+    public function after(): void
     {
         $str = $this->str->of(self::DESCRIPTION)->after('-')->get();
 
@@ -136,7 +151,8 @@ class StrTest extends Test
         $this->assertSame(self::AFTER, $str);
     }
 
-    public function testBetween(): void
+    #[Testing]
+    public function between(): void
     {
         $str = $this->str->of(self::DESCRIPTION)->between(self::HELLO, self::HELPERS)->get();
 
@@ -144,7 +160,8 @@ class StrTest extends Test
         $this->assertSame(self::BETWEEN, $str);
     }
 
-    public function testCamel(): void
+    #[Testing]
+    public function camel(): void
     {
         $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->camel()->get();
 
@@ -152,7 +169,8 @@ class StrTest extends Test
         $this->assertSame(self::CAMEL, $str);
     }
 
-    public function testPascal(): void
+    #[Testing]
+    public function pascal(): void
     {
         $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->pascal()->get();
 
@@ -160,7 +178,8 @@ class StrTest extends Test
         $this->assertSame(self::PASCAL, $str);
     }
 
-    public function testSnake(): void
+    #[Testing]
+    public function snake(): void
     {
         $str = $this->str->of(self::PREPEND . self::NAME)->snake(['-'])->get();
 
@@ -168,7 +187,8 @@ class StrTest extends Test
         $this->assertSame(self::SNAKE, $str);
     }
 
-    public function testKebab(): void
+    #[Testing]
+    public function kebab(): void
     {
         $str = $this->str->of(self::PREPEND . self::NAME)->kebab(['-'])->get();
 
@@ -176,7 +196,8 @@ class StrTest extends Test
         $this->assertSame(self::KEBAB, $str);
     }
 
-    public function testHeadline(): void
+    #[Testing]
+    public function headline(): void
     {
         $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->headline()->get();
 
@@ -184,7 +205,8 @@ class StrTest extends Test
         $this->assertSame(self::HEADLINE, $str);
     }
 
-    public function testLength(): void
+    #[Testing]
+    public function length(): void
     {
         $length = $this->str->of(self::NAME)->length();
 
@@ -192,7 +214,8 @@ class StrTest extends Test
         $this->assertSame(self::LENGHT, $length);
     }
 
-    public function testLimit(): void
+    #[Testing]
+    public function limit(): void
     {
         $str = $this->str->of(self::NAME)->limit(2)->get();
 
@@ -200,7 +223,8 @@ class StrTest extends Test
         $this->assertSame(self::LIMIT, $str);
     }
 
-    public function testLower(): void
+    #[Testing]
+    public function lower(): void
     {
         $str = $this->str->of(self::UPPER)->lower()->get();
 
@@ -208,7 +232,8 @@ class StrTest extends Test
         $this->assertSame(self::LOWER, $str);
     }
 
-    public function testUpper(): void
+    #[Testing]
+    public function upper(): void
     {
         $str = $this->str->of(self::LOWER)->upper()->get();
 
@@ -216,8 +241,9 @@ class StrTest extends Test
         $this->assertSame(self::UPPER, $str);
     }
 
+    #[Testing]
     #[DataProvider('maskProvider')]
-    public function testMaskInit(string $value, string $char, int $length, string $return): void
+    public function maskInit(string $value, string $char, int $length, string $return): void
     {
         $str = $this->str->of($value)->mask($char, $length)->get();
 
@@ -225,8 +251,9 @@ class StrTest extends Test
         $this->assertSame($return, $str);
     }
 
+    #[Testing]
     #[DataProvider('containsProvider')]
-    public function testContains(array $words, bool $return): void
+    public function contains(array $words, bool $return): void
     {
         $validate = $this->str->of(self::DESCRIPTION)->contains($words);
 
@@ -234,7 +261,8 @@ class StrTest extends Test
         $this->assertSame($return, $validate);
     }
 
-    public function testSwap(): void
+    #[Testing]
+    public function swap(): void
     {
         $str = $this->str->of(self::DESCRIPTION)->swap(self::SWAP_REPLACE)->get();
 
@@ -242,8 +270,9 @@ class StrTest extends Test
         $this->assertSame(self::DESCRIPTION_SWAP, $str);
     }
 
+    #[Testing]
     #[DataProvider('t3stProvider')]
-    public function testTest(string $value, string $expr, bool $return): void
+    public function test(string $value, string $expr, bool $return): void
     {
         $validate = $this->str->of($value)->test($expr);
 
@@ -251,8 +280,9 @@ class StrTest extends Test
         $this->assertSame($return, $validate);
     }
 
+    #[Testing]
     #[DataProvider('trimProvider')]
-    public function testTrim(string $desc, string $return, string $replace): void
+    public function trim(string $desc, string $return, string $replace): void
     {
         $str = $this->str->of($desc)->trim($replace)->get();
 
@@ -260,8 +290,9 @@ class StrTest extends Test
         $this->assertSame($return, $str);
     }
 
+    #[Testing]
     #[DataProvider('concatProvider')]
-    public function testConcat(string $desc, string $concat, string $return): void
+    public function concat(string $desc, string $concat, string $return): void
     {
         $str = $this->str->of($desc)->spaces()->concat($concat)->get();
 

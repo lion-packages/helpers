@@ -6,12 +6,12 @@ namespace Lion\Helpers;
 
 use Closure;
 use InvalidArgumentException;
-use Lion\Helpers\Str;
+use stdClass;
 
 /**
- * Modify and build arrays with different indexes or values.
+ * Modify and build arrays with different indexes or values
  *
- * @var array|object $items [Array containing current values]
+ * @property array<int|string, mixed>|stdClass $items [Array containing current values]
  *
  * @package Lion\Helpers
  */
@@ -20,9 +20,9 @@ class Arr
     /**
      * [Array containing current values]
      *
-     * @var array|object $items
+     * @var array<int|string, mixed>|stdClass $items
      */
-    private array|object $items = [];
+    private array|stdClass $items = [];
 
     /**
      * Resets the class property to its original value
@@ -50,9 +50,15 @@ class Arr
      * Get the indexes of the current array
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function keys(): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $this->items = array_keys($this->items);
 
         return $this;
@@ -62,9 +68,15 @@ class Arr
      * Get the values of the current array
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function values(): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $this->items = array_values($this->items);
 
         return $this;
@@ -73,9 +85,9 @@ class Arr
     /**
      * Gets the current value
      *
-     * @return array|object
+     * @return array<int|string, mixed>|stdClass
      */
-    public function get(): array|object
+    public function get(): array|stdClass
     {
         $items = $this->items;
 
@@ -91,9 +103,15 @@ class Arr
      * @param int|string $key [Index with which the value is added to the array]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function push(mixed $value, int|string $key = ''): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         if ('' === $key) {
             $this->items[] = $value;
         } else {
@@ -106,7 +124,7 @@ class Arr
     /**
      * Set the defined value as current value
      *
-     * @param array $items [Array containing current values]
+     * @param array<int|string, mixed> $items [Array containing current values]
      *
      * @return Arr
      */
@@ -121,9 +139,15 @@ class Arr
      * Gets the number of characters in the current string
      *
      * @return int
+     *
+     * @throws InvalidArgumentException
      */
     public function length(): int
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         return count($this->items);
     }
 
@@ -136,9 +160,15 @@ class Arr
      * string in the last part]
      *
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     public function join(string $separator = ', ', ?string $lastSeparator = null): string
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $items = $this->items;
 
         $this->clean();
@@ -151,6 +181,7 @@ class Arr
             return implode($separator, $items);
         }
 
+        /** @var string $lastElement */
         $lastElement = array_pop($items);
 
         return implode($separator, $items) . "{$lastSeparator}{$lastElement}";
@@ -162,16 +193,24 @@ class Arr
      * @param string $column [Column name]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function keyBy(string $column): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $newItems = [];
 
         foreach ($this->items as $item) {
             if ('object' === gettype($item)) {
                 $newItems[$item->{"{$column}"}] = $item;
             } else {
-                $newItems[$item[$column]] = $item;
+                if (is_array($item)) {
+                    $newItems[$item[$column]] = $item;
+                }
             }
         }
 
@@ -187,9 +226,15 @@ class Arr
      * @param string $column [Column name]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function tree(string $column): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $newItems = [];
 
         foreach ($this->items as $key => $item) {
@@ -197,13 +242,15 @@ class Arr
                 if (!isset($newItems[$item->{"{$column}"}])) {
                     $newItems[$item->{"{$column}"}] = [$item];
                 } else {
-                    array_push($newItems[$item->{"{$column}"}], $item);
+                    $newItems[$item->{"{$column}"}][] = $item;
                 }
             } else {
-                if (!isset($newItems[$item[$column]])) {
-                    $newItems[$item[$column]] = [$item];
-                } else {
-                    array_push($newItems[$item[$column]], $item);
+                if (is_array($item)) {
+                    if (!isset($newItems[$item[$column]])) {
+                        $newItems[$item[$column]] = [$item];
+                    } else {
+                        $newItems[$item[$column]][] = $item;
+                    }
                 }
             }
         }
@@ -220,9 +267,15 @@ class Arr
      * @param string $key [Index to add to current array]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function prepend(string $value, string $key = ''): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $this->items = '' === $key ? [$value, ...$this->items] : [$key => $value, ...$this->items];
 
         return $this;
@@ -234,9 +287,15 @@ class Arr
      * @param int $limit [Number of elements obtained from the current array]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function random(int $limit = 1): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $size = $this->length();
 
         if ($limit > $size) {
@@ -275,9 +334,15 @@ class Arr
      * element is added to the current array]
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function where(Closure $callback): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $newItems = [];
 
         foreach ($this->items as $key => $item) {
@@ -295,19 +360,28 @@ class Arr
      * Gets a new array of elements where the values are neither null nor empty
      *
      * @return Arr
+     *
+     * @throws InvalidArgumentException
      */
     public function whereNotEmpty(): Arr
     {
+        if (!is_array($this->items)) {
+            throw new InvalidArgumentException('Elements must be an array', 500);
+        }
+
         $str = new Str();
+
         $newItems = [];
 
         foreach ($this->items as $key => $item) {
-            if (in_array(gettype($item), ['array', 'object', 'closure'])) {
+            $type = gettype($item);
+
+            if ($type === 'array' || $type === 'object' || $item instanceof Closure) {
                 $newItems[$key] = $item;
-            } else {
-                if (!empty($str->of($item)->toNull()->get())) {
-                    $newItems[$key] = $item;
-                }
+            }
+
+            if (is_string($item) && null != $str->of($item)->toNull()->get()) {
+                $newItems[$key] = $item;
             }
         }
 
