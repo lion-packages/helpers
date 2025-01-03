@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Lion\Test\Test;
 use Lion\Helpers\Arr;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test as Testing;
 use Tests\Providers\ArrProviderTrait;
 
 class ArrTest extends Test
@@ -65,7 +66,8 @@ class ArrTest extends Test
         $this->arr = new Arr();
     }
 
-    public function testOf(): void
+    #[Testing]
+    public function of(): void
     {
         $arr = $this->arr->of(self::NAMES);
 
@@ -73,14 +75,16 @@ class ArrTest extends Test
         $this->assertSame($this->arr, $arr);
     }
 
-    public function testToObject(): void
+    #[Testing]
+    public function toObject(): void
     {
         $arr = $this->arr->of(self::NAMES)->toObject()->get();
 
         $this->assertIsObject($arr);
     }
 
-    public function testKeys(): void
+    #[Testing]
+    public function keys(): void
     {
         $arr = $this->arr->of(self::NAMES)->keys()->get();
 
@@ -88,7 +92,8 @@ class ArrTest extends Test
         $this->assertSame(self::KEYS_NAMES, $arr);
     }
 
-    public function testValues(): void
+    #[Testing]
+    public function values(): void
     {
         $arr = $this->arr->of(self::NAMES)->values()->get();
 
@@ -96,7 +101,8 @@ class ArrTest extends Test
         $this->assertSame(self::VALUES, $arr);
     }
 
-    public function testGet(): void
+    #[Testing]
+    public function get(): void
     {
         $arr = $this->arr->of(self::NAMES)->get();
 
@@ -104,7 +110,8 @@ class ArrTest extends Test
         $this->assertSame(self::NAMES, $arr);
     }
 
-    public function testPush(): void
+    #[Testing]
+    public function push(): void
     {
         $arr = $this->arr->of(self::NAMES)->push(self::DEV, self::USERNAME)->get();
 
@@ -112,7 +119,8 @@ class ArrTest extends Test
         $this->assertSame(self::NAMES_PUSH, $arr);
     }
 
-    public function testLength(): void
+    #[Testing]
+    public function length(): void
     {
         $length = $this->arr->of(self::NAMES)->length();
 
@@ -120,8 +128,9 @@ class ArrTest extends Test
         $this->assertSame(self::LENGTH, $length);
     }
 
+    #[Testing]
     #[DataProvider('joinProvider')]
-    public function testJoin(array $elements, string $separator, ?string $lastSeparator, string $return): void
+    public function join(array $elements, string $separator, ?string $lastSeparator, string $return): void
     {
         $str = $this->arr->of($elements)->join($separator, $lastSeparator);
 
@@ -129,7 +138,8 @@ class ArrTest extends Test
         $this->assertSame($return, $str);
     }
 
-    public function testKeyBy(): void
+    #[Testing]
+    public function keyBy(): void
     {
         $arr = $this->arr->of(self::KEY_LIST)->keyBy(self::ID)->get();
 
@@ -137,7 +147,8 @@ class ArrTest extends Test
         $this->assertSame(self::KEY_BY_LIST, $arr);
     }
 
-    public function testTree(): void
+    #[Testing]
+    public function tree(): void
     {
         $arr = $this->arr->of(self::TREE_LIST)->tree(self::ID)->get();
 
@@ -145,7 +156,8 @@ class ArrTest extends Test
         $this->assertSame(self::TREE_BY_LIST, $arr);
     }
 
-    public function testPrepend(): void
+    #[Testing]
+    public function prepend(): void
     {
         $arr = $this->arr->of(self::NAMES)->prepend('dev', 'developer')->get();
 
@@ -156,8 +168,9 @@ class ArrTest extends Test
         $this->assertSame(self::DEV, $arr['developer']);
     }
 
+    #[Testing]
     #[DataProvider('randomProvider')]
-    public function testRandom(array $list, int $limit): void
+    public function random(array $list, int $limit): void
     {
         $arr = $this->arr->of($list)->random($limit)->get();
 
@@ -165,7 +178,8 @@ class ArrTest extends Test
         $this->assertCount($limit, $arr);
     }
 
-    public function testMultipleRandom(): void
+    #[Testing]
+    public function multipleRandom(): void
     {
         $arr = $this->arr->of([self::ROOT, self::DEV, 'test', 'lion'])->random(self::TWO)->get();
 
@@ -173,15 +187,17 @@ class ArrTest extends Test
         $this->assertCount(self::TWO, $arr);
     }
 
-    public function testRandomException(): void
+    #[Testing]
+    public function randomException(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->arr->of([self::ROOT])->random(self::LIMIT)->get();
     }
 
+    #[Testing]
     #[DataProvider('whereProvider')]
-    public function testWhere(array $return, Closure $callback): void
+    public function where(array $return, Closure $callback): void
     {
         $arr = $this->arr->of(self::ELEMENTS)->where($callback)->get();
 
@@ -189,7 +205,8 @@ class ArrTest extends Test
         $this->assertSame($return, $arr);
     }
 
-    public function testWhereNotEmpty(): void
+    #[Testing]
+    public function whereNotEmpty(): void
     {
         $arr = $this->arr->of(self::ELEMENTS_WHERE_NOT_EMPTY)->whereNotEmpty()->get();
 
@@ -197,18 +214,21 @@ class ArrTest extends Test
         $this->assertSame(self::ELEMENTS_WHERE_NOT_EMPTY_FILTER, $arr);
     }
 
-    public function testFirst(): void
+    #[Testing]
+    public function first(): void
     {
         $this->assertSame(self::ROOT, $this->arr->of(self::NAMES_PUSH)->first());
     }
 
-    public function testLast(): void
+    #[Testing]
+    public function last(): void
     {
         $this->assertSame(self::DEV, $this->arr->of(self::NAMES_PUSH)->last());
     }
 
+    #[Testing]
     #[DataProvider('wrapProvider')]
-    public function testWrap(mixed $value, array $return): void
+    public function wrap(mixed $value, array $return): void
     {
         $arr = $this->arr->wrap($value)->get();
 
