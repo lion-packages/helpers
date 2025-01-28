@@ -65,7 +65,6 @@ class StrTest extends Test
     {
         $list = $this->str->of(self::NAME)->split(' ');
 
-        $this->assertIsArray($list);
         $this->assertSame([self::NAME], $list);
     }
 
@@ -210,7 +209,6 @@ class StrTest extends Test
     {
         $length = $this->str->of(self::NAME)->length();
 
-        $this->assertIsInt($length);
         $this->assertSame(self::LENGHT, $length);
     }
 
@@ -251,13 +249,18 @@ class StrTest extends Test
         $this->assertSame($return, $str);
     }
 
+    /**
+     * @param array<int, string> $words [List of words]
+     * @param bool $return [Return value]
+     *
+     * @return void
+     */
     #[Testing]
     #[DataProvider('containsProvider')]
     public function contains(array $words, bool $return): void
     {
         $validate = $this->str->of(self::DESCRIPTION)->contains($words);
 
-        $this->assertIsBool($validate);
         $this->assertSame($return, $validate);
     }
 
@@ -276,7 +279,6 @@ class StrTest extends Test
     {
         $validate = $this->str->of($value)->test($expr);
 
-        $this->assertIsBool($validate);
         $this->assertSame($return, $validate);
     }
 

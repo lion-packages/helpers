@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Providers;
 
+use Closure;
+
 trait ArrProviderTrait
 {
     private const string ROOT = 'root';
@@ -12,14 +14,23 @@ trait ArrProviderTrait
     private const int LENGTH = 1;
     private const int ONE = self::LENGTH;
     private const int TWO = 2;
-    private const int THREE = 3;
     private const array NAMES = ['name' => 'root'];
-    private const array NAMES_PUSH = ['name' => 'root', 'username' => 'dev'];
-    private const array NAMES_JOINS = ['name' => 'root', 'username' => 'dev', 'test' => 'testing'];
+    private const array NAMES_PUSH = [
+        'name' => 'root',
+        'username' => 'dev',
+    ];
+    private const array NAMES_JOINS = [
+        'name' => 'root',
+        'username' => 'dev',
+        'test' => 'testing',
+    ];
     private const array ELEMENTS = [9, 1, 5, 6, 4, 2, 8, 0, 3, 7];
     private const array ELEMENTS_WHERE_NOT_EMPTY = ['', null, self::ROOT, self::DEV];
     private const array ELEMENTS_WHERE_NOT_EMPTY_FILTER = [2 => self::ROOT, 3 => self::DEV];
 
+    /**
+     * @return array<int, array<string, string|array<string, string>|null>>
+     */
     public static function joinProvider(): array
     {
         return [
@@ -62,24 +73,30 @@ trait ArrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, int|array<int|string, string>>>
+     */
     public static function randomProvider(): array
     {
         return [
             [
-                'list' => [self::ROOT],
+                'randomList' => [self::ROOT],
                 'limit' => self::ONE
             ],
             [
-                'list' => self::NAMES,
+                'randomList' => self::NAMES,
                 'limit' => self::ONE
             ],
             [
-                'list' => self::NAMES_PUSH,
+                'randomList' => self::NAMES_PUSH,
                 'limit' => self::TWO
             ],
         ];
     }
 
+    /**
+     * @return array<int, array<string, Closure|array<int, int>>>
+     */
     public static function whereProvider(): array
     {
         return [
@@ -118,6 +135,9 @@ trait ArrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, string|array<int, string|array<int, string>>|null>>
+     */
     public static function wrapProvider(): array
     {
         return [

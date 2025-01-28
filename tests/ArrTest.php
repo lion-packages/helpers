@@ -21,20 +21,18 @@ class ArrTest extends Test
     private const array KEYS_NAMES = ['name'];
     private const string USERNAME = 'username';
     private const string DEV = 'dev';
-    private const string TESTING = 'testing';
-    private const string TEST = 'test';
     private const string AAA = 'AAA';
     private const string ABA = 'ABA';
     private const string ACA = 'ACA';
     private const array KEY_LIST = [
         [self::ID => self::AAA, ...self::NAMES_JOINS],
         [self::ID => self::ABA, ...self::NAMES_JOINS],
-        [self::ID => self::ACA, ...self::NAMES_JOINS]
+        [self::ID => self::ACA, ...self::NAMES_JOINS],
     ];
     private const array KEY_BY_LIST = [
         self::AAA => [self::ID => self::AAA, ...self::NAMES_JOINS],
         self::ABA => [self::ID => self::ABA, ...self::NAMES_JOINS],
-        self::ACA => [self::ID => self::ACA, ...self::NAMES_JOINS]
+        self::ACA => [self::ID => self::ACA, ...self::NAMES_JOINS],
     ];
     private const array TREE_LIST = [
         [self::ID => self::AAA, ...self::NAMES_JOINS],
@@ -42,20 +40,20 @@ class ArrTest extends Test
         [self::ID => self::ACA, ...self::NAMES_JOINS],
         [self::ID => self::AAA, ...self::NAMES_JOINS],
         [self::ID => self::ABA, ...self::NAMES_JOINS],
-        [self::ID => self::ACA, ...self::NAMES_JOINS]
+        [self::ID => self::ACA, ...self::NAMES_JOINS],
     ];
     private const array TREE_BY_LIST = [
         self::AAA => [
             [self::ID => self::AAA, ...self::NAMES_JOINS],
-            [self::ID => self::AAA, ...self::NAMES_JOINS]
+            [self::ID => self::AAA, ...self::NAMES_JOINS],
         ],
         self::ABA => [
             [self::ID => self::ABA, ...self::NAMES_JOINS],
-            [self::ID => self::ABA, ...self::NAMES_JOINS]
+            [self::ID => self::ABA, ...self::NAMES_JOINS],
         ],
         self::ACA => [
             [self::ID => self::ACA, ...self::NAMES_JOINS],
-            [self::ID => self::ACA, ...self::NAMES_JOINS]
+            [self::ID => self::ACA, ...self::NAMES_JOINS],
         ]
     ];
 
@@ -124,17 +122,23 @@ class ArrTest extends Test
     {
         $length = $this->arr->of(self::NAMES)->length();
 
-        $this->assertIsInt($length);
         $this->assertSame(self::LENGTH, $length);
     }
 
+    /**
+     * @param array<string, string> $elements [List of words]
+     * @param string $separator [Separation value]
+     * @param string|null $lastSeparator [End Separator]
+     * @param string $return [Return value]
+     *
+     * @return void
+     */
     #[Testing]
     #[DataProvider('joinProvider')]
     public function join(array $elements, string $separator, ?string $lastSeparator, string $return): void
     {
         $str = $this->arr->of($elements)->join($separator, $lastSeparator);
 
-        $this->assertIsString($str);
         $this->assertSame($return, $str);
     }
 
@@ -168,11 +172,17 @@ class ArrTest extends Test
         $this->assertSame(self::DEV, $arr['developer']);
     }
 
+    /**
+     * @param array<int|string, string> $randomList [List of random items]
+     * @param int $limit [Limit value]
+     *
+     * @return void
+     */
     #[Testing]
     #[DataProvider('randomProvider')]
-    public function random(array $list, int $limit): void
+    public function random(array $randomList, int $limit): void
     {
-        $arr = $this->arr->of($list)->random($limit)->get();
+        $arr = $this->arr->of($randomList)->random($limit)->get();
 
         $this->assertIsArray($arr);
         $this->assertCount($limit, $arr);
@@ -195,6 +205,12 @@ class ArrTest extends Test
         $this->arr->of([self::ROOT])->random(self::LIMIT)->get();
     }
 
+    /**
+     * @param array<int, int> $return
+     * @param Closure $callback [Filter method]
+     *
+     * @return void
+     */
     #[Testing]
     #[DataProvider('whereProvider')]
     public function where(array $return, Closure $callback): void
@@ -226,6 +242,12 @@ class ArrTest extends Test
         $this->assertSame(self::DEV, $this->arr->of(self::NAMES_PUSH)->last());
     }
 
+    /**
+     * @param mixed $value [Value inserted]
+     * @param array<int, string|array<int, string>> $return [Return list]
+     *
+     * @return void
+     */
     #[Testing]
     #[DataProvider('wrapProvider')]
     public function wrap(mixed $value, array $return): void
