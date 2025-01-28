@@ -6,6 +6,9 @@ namespace Tests\Providers;
 
 trait StrProviderTrait
 {
+    /**
+     * @return array<int, array<string, int|string>>
+     */
     public static function maskProvider(): array
     {
         return [
@@ -96,6 +99,9 @@ trait StrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, array<int, string>|bool>>
+     */
     public static function containsProvider(): array
     {
         return [
@@ -142,6 +148,9 @@ trait StrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, string|bool>>
+     */
     public static function t3stProvider(): array
     {
         return [
@@ -168,6 +177,9 @@ trait StrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, string>>
+     */
     public static function trimProvider(): array
     {
         return [
@@ -184,6 +196,9 @@ trait StrProviderTrait
         ];
     }
 
+    /**
+     * @return array<int, array<string, string>>
+     */
     public static function concatProvider(): array
     {
         return [
