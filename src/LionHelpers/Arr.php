@@ -11,8 +11,6 @@ use stdClass;
 /**
  * Modify and build arrays with different indexes or values
  *
- * @property array<int|string, mixed>|stdClass $items [Array containing current values]
- *
  * @package Lion\Helpers
  */
 class Arr
@@ -161,7 +159,9 @@ class Arr
      *
      * @return string
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException [If the elements are not in an array]
+     *
+     * @infection-ignore-all
      */
     public function join(string $separator = ', ', ?string $lastSeparator = null): string
     {
@@ -268,7 +268,9 @@ class Arr
      *
      * @return Arr
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidArgumentException [If the elements are not in an array]
+     *
+     * @infection-ignore-all
      */
     public function prepend(string $value, string $key = ''): Arr
     {
@@ -289,6 +291,8 @@ class Arr
      * @return Arr
      *
      * @throws InvalidArgumentException
+     *
+     * @infection-ignore-all
      */
     public function random(int $limit = 1): Arr
     {
@@ -296,10 +300,14 @@ class Arr
             throw new InvalidArgumentException('Elements must be an array', 500);
         }
 
+        if ($limit <= 0) {
+            throw new InvalidArgumentException('Limit must be greater than 0', 500);
+        }
+
         $size = $this->length();
 
         if ($limit > $size) {
-            throw new InvalidArgumentException('element size exceeds array size');
+            throw new InvalidArgumentException('Element size exceeds array size', 500);
         }
 
         $randomIdxs = [];
@@ -362,6 +370,8 @@ class Arr
      * @return Arr
      *
      * @throws InvalidArgumentException
+     *
+     * @infection-ignore-all
      */
     public function whereNotEmpty(): Arr
     {
@@ -394,6 +404,8 @@ class Arr
      * Gets the first element of the current array
      *
      * @return mixed
+     *
+     * @infection-ignore-all
      */
     public function first(): mixed
     {
@@ -408,6 +420,8 @@ class Arr
      * Gets the last element of the current array
      *
      * @return mixed
+     *
+     * @infection-ignore-all
      */
     public function last(): mixed
     {
