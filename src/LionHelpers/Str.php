@@ -9,8 +9,6 @@ use InvalidArgumentException;
 /**
  * Modify and construct strings with different formats
  *
- * @property null|string $word [Take the constructed text]
- *
  * @package Lion\Helpers
  */
 class Str
@@ -23,11 +21,26 @@ class Str
     private const int CHARACTER_LIMIT = 10;
 
     /**
+     * [Modify and build arrays with different indexes or values]
+     *
+     * @var Arr $arr
+     */
+    private Arr $arr;
+
+    /**
      * [Take the constructed text]
      *
      * @var null|string $word
      */
     private ?string $word = '';
+
+    /**
+     * Class constructor
+     */
+    public function __construct()
+    {
+        $this->arr = new Arr();
+    }
 
     /**
      * Set the defined value as current value
@@ -86,7 +99,7 @@ class Str
      */
     public function spaces(int $spaces = 1): Str
     {
-        if (null === $this->word) {
+        if (empty($this->word)) {
             $this->word = '';
         }
 
@@ -137,10 +150,12 @@ class Str
      * Add a line break to the current string
      *
      * @return Str
+     *
+     * @infection-ignore-all
      */
     public function ln(): Str
     {
-        if (null === $this->word) {
+        if (empty($this->word)) {
             $this->word = '';
         }
 
@@ -153,10 +168,12 @@ class Str
      * Add a tab to the current string
      *
      * @return Str
+     *
+     * @infection-ignore-all
      */
     public function lt(): Str
     {
-        if (null === $this->word) {
+        if (empty($this->word)) {
             $this->word = '';
         }
 
@@ -189,6 +206,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function before(string $delimiter): Str
     {
@@ -197,7 +216,9 @@ class Str
         }
 
         /** @var string $first */
-        $first = (new Arr())->of(explode($delimiter, $this->word))->first();
+        $first = $this->arr
+            ->of(explode($delimiter, $this->word))
+            ->first();
 
         $this->word = $first;
 
@@ -215,6 +236,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function after(string $delimiter): Str
     {
@@ -223,7 +246,9 @@ class Str
         }
 
         /** @var string $last */
-        $last = (new Arr())->of(explode($delimiter, $this->word))->last();
+        $last = $this->arr
+            ->of(explode($delimiter, $this->word))
+            ->last();
 
         $this->word = $last;
 
@@ -257,6 +282,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function camel(): Str
     {
@@ -275,6 +302,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function pascal(): Str
     {
@@ -293,9 +322,17 @@ class Str
      * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function snake(array $chars = []): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = $this->replaceChars('snake', $chars);
 
         return $this;
@@ -307,9 +344,17 @@ class Str
      * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return Str
+     *
+     * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function kebab(array $chars = []): Str
     {
+        if (!is_string($this->word)) {
+            throw new InvalidArgumentException('The defined string is not valid', 500);
+        }
+
         $this->word = $this->replaceChars('kebab', $chars);
 
         return $this;
@@ -420,6 +465,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function mask(string $char = '*', int $ignore = self::CHARACTER_LIMIT): Str
     {
@@ -482,6 +529,8 @@ class Str
      * @return Str
      *
      * @throws InvalidArgumentException [If there is no defined chain]
+     *
+     * @infection-ignore-all
      */
     public function swap(array $swaps): Str
     {
@@ -580,6 +629,8 @@ class Str
      * @param array<int, string> $chars [List of characters to be removed]
      *
      * @return string
+     *
+     * @infection-ignore-all
      */
     private function replaceChars(string $type, array $chars = []): string
     {

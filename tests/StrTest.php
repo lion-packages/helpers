@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use InvalidArgumentException;
+use Lion\Helpers\Arr;
 use Lion\Test\Test;
 use Lion\Helpers\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test as Testing;
 use PHPUnit\Framework\Attributes\TestWith;
+use ReflectionException;
 use Tests\Providers\StrProviderTrait;
 
 class StrTest extends Test
@@ -36,19 +39,57 @@ class StrTest extends Test
     private const string LIMIT = 'ro';
     private const string LOWER = 'lion';
     private const string UPPER = 'LION';
-    private const array SWAP_REPLACE = ['hello' => 'hi', 'helpers' => 'test', 'lion' => 'dev'];
+    private const array SWAP_REPLACE = [
+        'hello' => 'hi',
+        'helpers' => 'test',
+        'lion' => 'dev',
+    ];
 
     private Str $str;
 
+    /**
+     * @throws ReflectionException
+     */
     protected function setUp(): void
     {
         $this->str = new Str();
+
+        $this->initReflection($this->str);
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    #[Testing]
+    public function construct(): void
+    {
+        $this->assertInstanceOf(Arr::class, $this->getPrivateProperty('arr'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     #[Testing]
     public function get(): void
     {
-        $this->assertSame(self::NAME, $this->str->of(self::NAME)->get());
+        $this->str->of(self::NAME);
+
+        $word = $this->getPrivateProperty('word');
+
+        $this->assertIsString($word);
+        $this->assertNotEmpty($word);
+        $this->assertSame(self::NAME, $word);
+
+        $name = $this->str->get();
+
+        $this->assertIsString($name);
+        $this->assertNotEmpty($name);
+        $this->assertSame(self::NAME, $name);
+
+        $word = $this->getPrivateProperty('word');
+
+        $this->assertIsString($word);
+        $this->assertEmpty($word);
     }
 
     #[Testing]
@@ -63,7 +104,9 @@ class StrTest extends Test
     #[Testing]
     public function split(): void
     {
-        $list = $this->str->of(self::NAME)->split(' ');
+        $list = $this->str
+            ->of(self::NAME)
+            ->split(' ');
 
         $this->assertSame([self::NAME], $list);
     }
@@ -71,7 +114,10 @@ class StrTest extends Test
     #[Testing]
     public function spaces(): void
     {
-        $str = $this->str->of(self::NAME)->spaces()->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->spaces()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::NAME . ' ', $str);
@@ -80,7 +126,10 @@ class StrTest extends Test
     #[Testing]
     public function replace(): void
     {
-        $str = $this->str->of(self::NAME)->replace(self::NAME, self::NAME_REPLACE)->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->replace(self::NAME, self::NAME_REPLACE)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::NAME_REPLACE, $str);
@@ -89,7 +138,10 @@ class StrTest extends Test
     #[Testing]
     public function prepend(): void
     {
-        $str = $this->str->of(self::NAME)->prepend(self::PREPEND)->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->prepend(self::PREPEND)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::PREPEND . self::NAME, $str);
@@ -98,7 +150,10 @@ class StrTest extends Test
     #[Testing]
     public function ln(): void
     {
-        $str = $this->str->of(self::NAME)->ln()->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->ln()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertStringContainsString(self::LN, $str);
@@ -107,7 +162,10 @@ class StrTest extends Test
     #[Testing]
     public function lt(): void
     {
-        $str = $this->str->of(self::NAME)->lt()->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->lt()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertStringContainsString(self::LT, $str);
@@ -118,7 +176,10 @@ class StrTest extends Test
     #[TestWith(['of' => ''])]
     public function toNull(?string $of): void
     {
-        $str = $this->str->of($of)->toNull()->get();
+        $str = $this->str
+            ->of($of)
+            ->toNull()
+            ->get();
 
         $this->assertNull($str);
     }
@@ -126,7 +187,10 @@ class StrTest extends Test
     #[Testing]
     public function toNullWithString(): void
     {
-        $str = $this->str->of(self::NAME)->toNull()->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->toNull()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::NAME, $str);
@@ -135,25 +199,58 @@ class StrTest extends Test
     #[Testing]
     public function before(): void
     {
-        $str = $this->str->of(self::DESCRIPTION)->before('-')->get();
+        $str = $this->str
+            ->of(self::DESCRIPTION)
+            ->before('-')
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::BEFORE, $str);
     }
 
     #[Testing]
+    public function beforeWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->before('-');
+    }
+
+    #[Testing]
     public function after(): void
     {
-        $str = $this->str->of(self::DESCRIPTION)->after('-')->get();
+        $str = $this->str
+            ->of(self::DESCRIPTION)
+            ->after('-')
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::AFTER, $str);
     }
 
     #[Testing]
+    public function afterWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->after('-');
+    }
+
+    #[Testing]
     public function between(): void
     {
-        $str = $this->str->of(self::DESCRIPTION)->between(self::HELLO, self::HELPERS)->get();
+        $str = $this->str
+            ->of(self::DESCRIPTION)
+            ->between(self::HELLO, self::HELPERS)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::BETWEEN, $str);
@@ -162,43 +259,109 @@ class StrTest extends Test
     #[Testing]
     public function camel(): void
     {
-        $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->camel()->get();
+        $str = $this->str
+            ->of(self::PREPEND . self::NAME)
+            ->replace('-', ' ')
+            ->camel()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::CAMEL, $str);
     }
 
     #[Testing]
+    public function camelWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->camel();
+    }
+
+    #[Testing]
     public function pascal(): void
     {
-        $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->pascal()->get();
+        $str = $this->str
+            ->of(self::PREPEND . self::NAME)
+            ->replace('-', ' ')
+            ->pascal()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::PASCAL, $str);
     }
 
     #[Testing]
+    public function pascalWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->pascal();
+    }
+
+    #[Testing]
     public function snake(): void
     {
-        $str = $this->str->of(self::PREPEND . self::NAME)->snake(['-'])->get();
+        $str = $this->str
+            ->of(self::PREPEND . self::NAME)
+            ->snake(['-'])
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::SNAKE, $str);
     }
 
     #[Testing]
+    public function snakeWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->snake();
+    }
+
+    #[Testing]
     public function kebab(): void
     {
-        $str = $this->str->of(self::PREPEND . self::NAME)->kebab(['-'])->get();
+        $str = $this->str
+            ->of(self::PREPEND . self::NAME)
+            ->kebab(['-'])
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::KEBAB, $str);
     }
 
     #[Testing]
+    public function kebabWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->kebab();
+    }
+
+    #[Testing]
     public function headline(): void
     {
-        $str = $this->str->of(self::PREPEND . self::NAME)->replace('-', ' ')->headline()->get();
+        $str = $this->str
+            ->of(self::PREPEND . self::NAME)
+            ->replace('-', ' ')
+            ->headline()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::HEADLINE, $str);
@@ -207,7 +370,9 @@ class StrTest extends Test
     #[Testing]
     public function length(): void
     {
-        $length = $this->str->of(self::NAME)->length();
+        $length = $this->str
+            ->of(self::NAME)
+            ->length();
 
         $this->assertSame(self::LENGHT, $length);
     }
@@ -215,7 +380,10 @@ class StrTest extends Test
     #[Testing]
     public function limit(): void
     {
-        $str = $this->str->of(self::NAME)->limit(2)->get();
+        $str = $this->str
+            ->of(self::NAME)
+            ->limit(2)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::LIMIT, $str);
@@ -224,7 +392,10 @@ class StrTest extends Test
     #[Testing]
     public function lower(): void
     {
-        $str = $this->str->of(self::UPPER)->lower()->get();
+        $str = $this->str
+            ->of(self::UPPER)
+            ->lower()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::LOWER, $str);
@@ -233,7 +404,10 @@ class StrTest extends Test
     #[Testing]
     public function upper(): void
     {
-        $str = $this->str->of(self::LOWER)->upper()->get();
+        $str = $this->str
+            ->of(self::LOWER)
+            ->upper()
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::UPPER, $str);
@@ -243,7 +417,10 @@ class StrTest extends Test
     #[DataProvider('maskProvider')]
     public function maskInit(string $value, string $char, int $length, string $return): void
     {
-        $str = $this->str->of($value)->mask($char, $length)->get();
+        $str = $this->str
+            ->of($value)
+            ->mask($char, $length)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame($return, $str);
@@ -259,7 +436,9 @@ class StrTest extends Test
     #[DataProvider('containsProvider')]
     public function contains(array $words, bool $return): void
     {
-        $validate = $this->str->of(self::DESCRIPTION)->contains($words);
+        $validate = $this->str
+            ->of(self::DESCRIPTION)
+            ->contains($words);
 
         $this->assertSame($return, $validate);
     }
@@ -267,17 +446,34 @@ class StrTest extends Test
     #[Testing]
     public function swap(): void
     {
-        $str = $this->str->of(self::DESCRIPTION)->swap(self::SWAP_REPLACE)->get();
+        $str = $this->str
+            ->of(self::DESCRIPTION)
+            ->swap(self::SWAP_REPLACE)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame(self::DESCRIPTION_SWAP, $str);
     }
 
     #[Testing]
+    public function swapWithWordIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('The defined string is not valid');
+
+        $this->str
+            ->toNull()
+            ->swap([]);
+    }
+
+    #[Testing]
     #[DataProvider('t3stProvider')]
     public function test(string $value, string $expr, bool $return): void
     {
-        $validate = $this->str->of($value)->test($expr);
+        $validate = $this->str
+            ->of($value)
+            ->test($expr);
 
         $this->assertSame($return, $validate);
     }
@@ -286,7 +482,10 @@ class StrTest extends Test
     #[DataProvider('trimProvider')]
     public function trim(string $desc, string $return, string $replace): void
     {
-        $str = $this->str->of($desc)->trim($replace)->get();
+        $str = $this->str
+            ->of($desc)
+            ->trim($replace)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame($return, $str);
@@ -296,7 +495,11 @@ class StrTest extends Test
     #[DataProvider('concatProvider')]
     public function concat(string $desc, string $concat, string $return): void
     {
-        $str = $this->str->of($desc)->spaces()->concat($concat)->get();
+        $str = $this->str
+            ->of($desc)
+            ->spaces()
+            ->concat($concat)
+            ->get();
 
         $this->assertIsString($str);
         $this->assertSame($return, $str);

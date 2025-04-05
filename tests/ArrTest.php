@@ -10,6 +10,7 @@ use Lion\Test\Test;
 use Lion\Helpers\Arr;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test as Testing;
+use ReflectionException;
 use Tests\Providers\ArrProviderTrait;
 
 class ArrTest extends Test
@@ -59,9 +60,14 @@ class ArrTest extends Test
 
     private Arr $arr;
 
+    /**
+     * @throws ReflectionException
+     */
     protected function setUp(): void
     {
         $this->arr = new Arr();
+
+        $this->initReflection($this->arr);
     }
 
     #[Testing]
@@ -76,7 +82,10 @@ class ArrTest extends Test
     #[Testing]
     public function toObject(): void
     {
-        $arr = $this->arr->of(self::NAMES)->toObject()->get();
+        $arr = $this->arr
+            ->of(self::NAMES)
+            ->toObject()
+            ->get();
 
         $this->assertIsObject($arr);
     }
@@ -84,7 +93,10 @@ class ArrTest extends Test
     #[Testing]
     public function keys(): void
     {
-        $arr = $this->arr->of(self::NAMES)->keys()->get();
+        $arr = $this->arr
+            ->of(self::NAMES)
+            ->keys()
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertSame(self::KEYS_NAMES, $arr);
@@ -93,25 +105,47 @@ class ArrTest extends Test
     #[Testing]
     public function values(): void
     {
-        $arr = $this->arr->of(self::NAMES)->values()->get();
+        $arr = $this->arr
+            ->of(self::NAMES)
+            ->values()
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertSame(self::VALUES, $arr);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     #[Testing]
     public function get(): void
     {
-        $arr = $this->arr->of(self::NAMES)->get();
+        $this->arr->of(self::NAMES);
+
+        $items = $this->getPrivateProperty('items');
+
+        $this->assertIsArray($items);
+        $this->assertNotEmpty($items);
+        $this->assertSame(self::NAMES, $items);
+
+        $arr = $this->arr->get();
 
         $this->assertIsArray($arr);
         $this->assertSame(self::NAMES, $arr);
+
+        $items = $this->getPrivateProperty('items');
+
+        $this->assertIsArray($items);
+        $this->assertEmpty($items);
     }
 
     #[Testing]
     public function push(): void
     {
-        $arr = $this->arr->of(self::NAMES)->push(self::DEV, self::USERNAME)->get();
+        $arr = $this->arr
+            ->of(self::NAMES)
+            ->push(self::DEV, self::USERNAME)
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertSame(self::NAMES_PUSH, $arr);
@@ -120,7 +154,9 @@ class ArrTest extends Test
     #[Testing]
     public function length(): void
     {
-        $length = $this->arr->of(self::NAMES)->length();
+        $length = $this->arr
+            ->of(self::NAMES)
+            ->length();
 
         $this->assertSame(self::LENGTH, $length);
     }
@@ -182,7 +218,10 @@ class ArrTest extends Test
     #[DataProvider('randomProvider')]
     public function random(array $randomList, int $limit): void
     {
-        $arr = $this->arr->of($randomList)->random($limit)->get();
+        $arr = $this->arr
+            ->of($randomList)
+            ->random($limit)
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertCount($limit, $arr);
@@ -191,18 +230,58 @@ class ArrTest extends Test
     #[Testing]
     public function multipleRandom(): void
     {
-        $arr = $this->arr->of([self::ROOT, self::DEV, 'test', 'lion'])->random(self::TWO)->get();
+        $arr = $this->arr
+            ->of([
+                self::ROOT,
+                self::DEV,
+                'test',
+                'lion',
+            ])
+            ->random(self::TWO)
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertCount(self::TWO, $arr);
     }
 
     #[Testing]
-    public function randomException(): void
+    public function randomWithItemsIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('Elements must be an array');
 
-        $this->arr->of([self::ROOT])->random(self::LIMIT)->get();
+        $this->arr
+            ->of([self::ROOT])
+            ->toObject()
+            ->random(self::LIMIT)
+            ->get();
+    }
+
+    #[Testing]
+    public function randomWithLimitIsNotValid(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('Limit must be greater than 0');
+
+        $this->arr
+            ->of([self::ROOT])
+            ->random(0)
+            ->get();
+    }
+
+    #[Testing]
+    public function randomWithLimitExceedsArraySize(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionCode(500);
+        $this->expectExceptionMessage('Element size exceeds array size');
+
+        $this->arr
+            ->of([self::ROOT])
+            ->random(2)
+            ->get();
     }
 
     /**
@@ -215,7 +294,10 @@ class ArrTest extends Test
     #[DataProvider('whereProvider')]
     public function where(array $return, Closure $callback): void
     {
-        $arr = $this->arr->of(self::ELEMENTS)->where($callback)->get();
+        $arr = $this->arr
+            ->of(self::ELEMENTS)
+            ->where($callback)
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertSame($return, $arr);
@@ -224,7 +306,10 @@ class ArrTest extends Test
     #[Testing]
     public function whereNotEmpty(): void
     {
-        $arr = $this->arr->of(self::ELEMENTS_WHERE_NOT_EMPTY)->whereNotEmpty()->get();
+        $arr = $this->arr
+            ->of(self::ELEMENTS_WHERE_NOT_EMPTY)
+            ->whereNotEmpty()
+            ->get();
 
         $this->assertIsArray($arr);
         $this->assertSame(self::ELEMENTS_WHERE_NOT_EMPTY_FILTER, $arr);
