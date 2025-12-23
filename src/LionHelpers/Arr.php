@@ -205,10 +205,12 @@ class Arr
         $newItems = [];
 
         foreach ($this->items as $item) {
-            if ('object' === gettype($item)) {
-                $newItems[$item->{"{$column}"}] = $item;
+            if ($item instanceof stdClass) {
+                /** @phpstan-ignore-next-line */
+                $newItems[$item->{$column}] = $item;
             } else {
                 if (is_array($item)) {
+                    /** @phpstan-ignore-next-line */
                     $newItems[$item[$column]] = $item;
                 }
             }
@@ -238,17 +240,23 @@ class Arr
         $newItems = [];
 
         foreach ($this->items as $key => $item) {
-            if ('object' === gettype($item)) {
-                if (!isset($newItems[$item->{"{$column}"}])) {
-                    $newItems[$item->{"{$column}"}] = [$item];
+            if ($item instanceof stdClass) {
+                /** @phpstan-ignore-next-line */
+                if (!isset($newItems[$item->{$column}])) {
+                    /** @phpstan-ignore-next-line */
+                    $newItems[$item->{$column}] = [$item];
                 } else {
-                    $newItems[$item->{"{$column}"}][] = $item;
+                    /** @phpstan-ignore-next-line */
+                    $newItems[$item->{$column}][] = $item;
                 }
             } else {
                 if (is_array($item)) {
+                    /** @phpstan-ignore-next-line */
                     if (!isset($newItems[$item[$column]])) {
+                        /** @phpstan-ignore-next-line */
                         $newItems[$item[$column]] = [$item];
                     } else {
+                        /** @phpstan-ignore-next-line */
                         $newItems[$item[$column]][] = $item;
                     }
                 }

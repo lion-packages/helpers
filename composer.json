@@ -1,6 +1,6 @@
 {
     "name": "lion/helpers",
-    "description": "Easy to use helpers for any type of use",
+    "description": "Easy-to-use helpers for handling chains or arrangements.",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -14,7 +14,7 @@
         }
     },
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.5"
     },
     "require-dev": {
         "lion/test": "^2.0 || ^3.0",
