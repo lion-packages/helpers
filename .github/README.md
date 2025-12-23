@@ -5,7 +5,7 @@
     <img src="https://poser.pugx.org/lion/helpers/v" alt="Latest Stable Version">
   </a>
   <a href="https://packagist.org/packages/lion/helpers">
-    <img src="https://poser.pugx.org/lion/herlpers/downloads" alt="Total Downloads">
+    <img src="https://poser.pugx.org/lion/helpers/downloads" alt="Total Downloads">
   </a>
   <a href="https://github.com/lion-packages/helpers/blob/main/LICENSE">
     <img src="https://poser.pugx.org/lion/helpers/license" alt="License">
