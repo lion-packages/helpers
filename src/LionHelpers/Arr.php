@@ -174,16 +174,19 @@ class Arr
         $this->clean();
 
         if (null === $lastSeparator) {
+            /** @phpstan-ignore-next-line */
             return implode($separator, $items);
         }
 
         if (count($items) <= 1) {
+            /** @phpstan-ignore-next-line */
             return implode($separator, $items);
         }
 
         /** @var string $lastElement */
         $lastElement = array_pop($items);
 
+        /** @phpstan-ignore-next-line */
         return implode($separator, $items) . "{$lastSeparator}{$lastElement}";
     }
 
